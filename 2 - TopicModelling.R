@@ -108,7 +108,7 @@ many_models6 <- data_frame(K = seq(2, 50, 2)) %>%
                                        control = control), 
                                   .progress = TRUE))
 
-saveRDS(many_models6, "saved_data/many_models6_20181001.rds")
+saveRDS(many_models6, "saved_data/many_models6_20181001b.rds")
 
 heldout <- make.heldout(sparse_posts_txts)
 
@@ -137,7 +137,7 @@ k_result %>%
        title = "Model diagnostics by number of topics",
        subtitle = "Searching for the magical K")
 
-ggsave("plots/many_models6.pdf",
+ggsave("plots/many_models6b.pdf",
        width = 19.2,
        height = 10.8,
        units = "cm")
