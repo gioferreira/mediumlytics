@@ -134,3 +134,17 @@ ggsave("plots/many_models6.pdf",
        width = 19.2,
        height = 10.8,
        units = "cm")
+
+## Follow up evaluation using Many_Models6 with 2, 10, 16, 22 topics.
+
+k_result %>%
+  select(K, exclusivity, semantic_coherence) %>%
+  filter(K %in% c(2, 10, 16, 22)) %>%
+  unnest() %>%
+  mutate(K = as.factor(K)) %>%
+  ggplot(aes(semantic_coherence, exclusivity, color = K)) +
+  geom_point(size = 2, alpha = 0.7) +
+  labs(x = "Semantic coherence",
+       y = "Exclusivity",
+       title = "Comparing exclusivity and semantic coherence",
+       subtitle = "Models with fewer topics have higher semantic coherence for more topics, but lower exclusivity")
