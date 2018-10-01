@@ -199,3 +199,9 @@ gamma_terms %>%
   labs(x = NULL, y = expression(gamma),
        title = "Top 20 topics by prevalence in the Hacker News corpus",
        subtitle = "With the top words that contribute to each topic")
+
+
+gamma_terms %>%
+  select(topic, gamma, terms) %>%
+  kable(digits = 3, 
+        col.names = c("Topic", "Expected topic proportion", "Top 7 terms"))
