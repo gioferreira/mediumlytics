@@ -76,4 +76,61 @@ k_result %>%
   labs(x = "K (number of topics)",
        y = NULL,
        title = "Model diagnostics by number of topics",
-       subtitle = "Searchin for the magical K")
+       subtitle = "Searching for the magical K")
+
+ggsave("plots/many_models5.pdf",
+       width = 19.2,
+       height = 10.8,
+       units = "cm")
+
+
+# Many Models 6
+## Playing with control parameter for stm
+
+plan(cluster)
+
+control <- list("nits" = 500,
+                "burnin" = 50)
+
+many_models6 <- data_frame(K = seq(2, 50, 2)) %>%
+  mutate(topic_model = future_map(K, 
+                                  ~stm(sparse_posts_txts, 
+                                       K = ., 
+                                       verbose = TRUE,
+                                       init.type = "LDA",
+                                       control = control), 
+                                  .progress = TRUE))
+
+saveRDS(many_models6, "saved_data/many_models6_20181001.rds")
+
+heldout <- make.heldout(sparse_posts_txts)
+
+k_result <- many_models6 %>%
+  mutate(exclusivity = map(topic_model, exclusivity),
+         semantic_coherence = map(topic_model, semanticCoherence, sparse_posts_txts),
+         eval_heldout = map(topic_model, eval.heldout, heldout$missing),
+         residual = map(topic_model, checkResiduals, sparse_posts_txts),
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),
+         lbound = bound + lfact,
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
+
+k_result %>%
+  transmute(K,
+            `Lower bound` = lbound,
+            Residuals = map_dbl(residual, "dispersion"),
+            `Semantic coherence` = map_dbl(semantic_coherence, mean),
+            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%
+  gather(Metric, Value, -K) %>%
+  ggplot(aes(K, Value, color = Metric)) +
+  geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +
+  facet_wrap(~Metric, scales = "free_y") +
+  labs(x = "K (number of topics)",
+       y = NULL,
+       title = "Model diagnostics by number of topics",
+       subtitle = "Searching for the magical K")
+
+ggsave("plots/many_models6.pdf",
+       width = 19.2,
+       height = 10.8,
+       units = "cm")
