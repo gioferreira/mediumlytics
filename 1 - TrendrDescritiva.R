@@ -52,7 +52,7 @@ library(gghighlight)
 # 
 # posts_tbl_processed %>% write_csv(path = "saved_data/posts_tbl_processed_20180928.csv")
 
-posts_tbl_processed <- read_csv("saved_data/posts_tbl_processed_20180928.csv")
+posts_tbl_processed <- read_csv("saved_data/posts_tbl_processed_20180930.csv")
 
 ################################################
 # Total de posts por mês
