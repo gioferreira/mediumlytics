@@ -51,7 +51,6 @@ many_models5 <- data_frame(K = seq(2, 50, 2)) %>%
 
 saveRDS(many_models5, "saved_data/many_models5_20180930.rds")
 
-
 heldout <- make.heldout(sparse_posts_txts)
 
 k_result <- many_models5 %>%
@@ -77,4 +76,4 @@ k_result %>%
   labs(x = "K (number of topics)",
        y = NULL,
        title = "Model diagnostics by number of topics",
-       subtitle = "These diagnostics indicate that a good number of topics would be around 60")
+       subtitle = "Searchin for the magical K")
