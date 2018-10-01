@@ -139,7 +139,7 @@ ggsave("plots/many_models6.pdf",
 
 k_result %>%
   select(K, exclusivity, semantic_coherence) %>%
-  filter(K %in% c(2, 10, 16, 22)) %>%
+  filter(K %in% c(2, 10, 16, 22, 40)) %>%
   unnest() %>%
   mutate(K = as.factor(K)) %>%
   ggplot(aes(semantic_coherence, exclusivity, color = K)) +
@@ -157,3 +157,45 @@ topic_model <- k_result %>%
   .[[1]]
 
 topic_model
+
+## Exploring the topic model
+
+td_beta <- tidy(topic_model)
+td_gamma <- tidy(topic_model, matrix = "gamma",
+                 document_names = rownames(sparse_posts_txts))
+
+top_terms <- td_beta %>%
+  arrange(beta) %>%
+  group_by(topic) %>%
+  top_n(7, beta) %>%
+  arrange(-beta) %>%
+  select(topic, term) %>%
+  summarise(terms = list(term)) %>%
+  mutate(terms = map(terms, paste, collapse = ", ")) %>% 
+  unnest()
+
+gamma_terms <- td_gamma %>%
+  group_by(topic) %>%
+  summarise(gamma = mean(gamma)) %>%
+  arrange(desc(gamma)) %>%
+  left_join(top_terms, by = "topic") %>%
+  mutate(topic = paste0("Topic ", topic),
+         topic = reorder(topic, gamma))
+
+gamma_terms %>%
+  top_n(22, gamma) %>%
+  ggplot(aes(topic, gamma, label = terms, fill = topic)) +
+  geom_col(show.legend = FALSE) +
+  geom_text(hjust = 0, nudge_y = 0.0005, size = 3,
+            family = "IBMPlexSans") +
+  coord_flip() +
+  scale_y_continuous(expand = c(0,0),
+                     limits = c(0, 0.09),
+                     labels = percent_format()) +
+  theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) +
+  theme(plot.title = element_text(size = 16,
+                                  family="IBMPlexSans-Bold"),
+        plot.subtitle = element_text(size = 13)) +
+  labs(x = NULL, y = expression(gamma),
+       title = "Top 20 topics by prevalence in the Hacker News corpus",
+       subtitle = "With the top words that contribute to each topic")
