@@ -36,7 +36,8 @@ names(stop_words_total) <- "word"
 
 tidy_posts_txts <- posts_txts %>%
   unnest_tokens(word, text, token = "words") %>%
-  anti_join(stop_words_total)
+  anti_join(stop_words_total) %>%
+  filter(!str_detect(word, "[0-9]+"))
 
 sparse_posts_txts <- tidy_posts_txts %>%
   count(id, word) %>%
@@ -142,11 +143,11 @@ ggsave("plots/many_models6b.pdf",
        height = 10.8,
        units = "cm")
 
-## Follow up evaluation using Many_Models6b with 2, 10, 16, 22 topics.
+## Follow up evaluation using Many_Models6b with 2, 10, 16, 24, 28, 42 topics.
 
 k_result %>%
   select(K, exclusivity, semantic_coherence) %>%
-  filter(K %in% c(2, 10, 16, 22, 40)) %>%
+  filter(K %in% c(2, 10, 16, 24, 28, 42)) %>%
   unnest() %>%
   mutate(K = as.factor(K)) %>%
   ggplot(aes(semantic_coherence, exclusivity, color = K)) +
@@ -156,10 +157,10 @@ k_result %>%
        title = "Comparing exclusivity and semantic coherence",
        subtitle = "Models with fewer topics have higher semantic coherence for more topics, but lower exclusivity")
 
-## Extracting topic_model with 22 topics
+## Extracting topic_model with 24 topics
 
 topic_model <- k_result %>% 
-  filter(K == 22) %>% 
+  filter(K == 24) %>% 
   pull(topic_model) %>% 
   .[[1]]
 
@@ -190,7 +191,7 @@ gamma_terms <- td_gamma %>%
          topic = reorder(topic, gamma))
 
 gamma_terms %>%
-  top_n(22, gamma) %>%
+  top_n(24, gamma) %>%
   ggplot(aes(topic, gamma, label = terms, fill = topic)) +
   geom_col(show.legend = FALSE) +
   geom_text(hjust = 0, nudge_y = 0.0005, size = 3,
