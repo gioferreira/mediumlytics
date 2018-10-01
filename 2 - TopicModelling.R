@@ -142,7 +142,7 @@ ggsave("plots/many_models6b.pdf",
        height = 10.8,
        units = "cm")
 
-## Follow up evaluation using Many_Models6 with 2, 10, 16, 22 topics.
+## Follow up evaluation using Many_Models6b with 2, 10, 16, 22 topics.
 
 k_result %>%
   select(K, exclusivity, semantic_coherence) %>%
