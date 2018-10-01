@@ -24,12 +24,19 @@ posts_tbl_processed <- read_csv("saved_data/posts_tbl_processed_20180930.csv")
 posts_txts <- posts_tbl_processed %>%
   select(id, text)
 
-stop_words <- read_csv("saved_data/final_stopwords.txt", col_names = FALSE)
-names(stop_words) <- "word"
+stop_words <- read_lines("saved_data/final_stopwords.txt")
+stop_words_total <- unique(c(tm::stopwords('en'),
+                             tm::stopwords('SMART'),
+                             tm::stopwords('pt'),
+                             stop_words))
+
+stop_words_total <- as_tibble(stop_words_total)
+
+names(stop_words_total) <- "word"
 
 tidy_posts_txts <- posts_txts %>%
   unnest_tokens(word, text, token = "words") %>%
-  anti_join(stop_words)
+  anti_join(stop_words_total)
 
 sparse_posts_txts <- tidy_posts_txts %>%
   count(id, word) %>%
