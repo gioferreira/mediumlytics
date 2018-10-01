@@ -148,3 +148,12 @@ k_result %>%
        y = "Exclusivity",
        title = "Comparing exclusivity and semantic coherence",
        subtitle = "Models with fewer topics have higher semantic coherence for more topics, but lower exclusivity")
+
+## Extracting topic_model with 22 topics
+
+topic_model <- k_result %>% 
+  filter(K == 22) %>% 
+  pull(topic_model) %>% 
+  .[[1]]
+
+topic_model
