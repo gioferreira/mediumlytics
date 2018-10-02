@@ -36,9 +36,28 @@ docs <- out$documents
 vocab <- out$vocab
 meta <- out$meta
 
+# Use spectral init with k = 0 to search for the ideal K
 spectral_init <- stm(documents = docs,
                      vocab = vocab,
                      K = 0,
                      prevalence = ~ user_id + s(day_published),
                      data = meta,
                      init.type = "Spectral")
+
+
+# Use Tidy Text Method to model stm with different Ks and choosing the best one
+plan(cluster)
+
+many_models_20181002 <- data_frame(K = seq(6, 70, 2)) %>%
+  mutate(topic_model = future_map(K,
+                                  ~stm(documents = docs,
+                                       vocab = vocab,
+                                       K = .,
+                                       prevalence = ~ user_id + s(day_published),
+                                       data = meta, 
+                                       verbose = TRUE,
+                                       init.type = "Spectral"),
+                                  .progress = TRUE))
+
+saveRDS(many_models_20181002, "saved_data/many_models_20181002.rds")
+
