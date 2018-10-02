@@ -44,6 +44,7 @@ spectral_init <- stm(documents = docs,
                      data = meta,
                      init.type = "Spectral")
 
+saveRDS(spectral_init, "saved_data/spectral_init_k0_20181002.rds")
 
 # Use Tidy Text Method to model stm with different Ks and choosing the best one
 plan(cluster)
