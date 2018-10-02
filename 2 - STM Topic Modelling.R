@@ -18,3 +18,20 @@ posts_txts <- posts_tbl_processed %>%
   select(-first_published_at) %>%
   arrange_vars(c("day_published" = 3))
 
+stop_words <- read_lines("saved_data/final_stopwords.txt")
+stop_words_total <- unique(c(tm::stopwords('en'),
+                             tm::stopwords('SMART'),
+                             tm::stopwords('pt'),
+                             stop_words))
+
+processed_txts <- textProcessor(posts_txts$text, 
+                                metadata = posts_txts,
+                                removestopwords = FALSE,
+                                stem = FALSE,
+                                language = "pt",
+                                customstopwords = stop_words_total)
+
+out <- prepDocuments(processed_txts$documents, processed_txts$vocab, processed_txts$meta)
+docs <- out$documents
+vocab <- out$vocab
+meta <- out$meta
