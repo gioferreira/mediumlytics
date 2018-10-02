@@ -43,10 +43,6 @@ sparse_posts_txts <- tidy_posts_txts %>%
   count(id, word) %>%
   cast_sparse(id, word, n)
 
-# dfm_posts_txts <- tidy_posts_txts %>%
-#   count(id, word, sort = TRUE) %>%
-#   cast_dfm(id, word, n)
-# 
 # # Many Models 6
 # ## Playing with control parameter for stm
 # 
@@ -154,6 +150,70 @@ gamma_terms %>%
   ggplot(aes(topic, gamma, label = terms, fill = topic)) +
   geom_col(show.legend = FALSE) +
   geom_text(hjust = 0, nudge_y = 0.0005, size = 3,
+            family = "IBMPlexSans") +
+  coord_flip() +
+  scale_y_continuous(expand = c(0,0),
+                     limits = c(0, 0.09),
+                     labels = percent_format()) +
+  theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) +
+  theme(plot.title = element_text(size = 16,
+                                  family="IBMPlexSans-Bold"),
+        plot.subtitle = element_text(size = 13)) +
+  labs(x = NULL, y = expression(gamma),
+       title = "Top 20 topics by prevalence",
+       subtitle = "With the top words that contribute to each topic")
+
+
+gamma_terms %>%
+  select(topic, gamma, terms) %>%
+  kable(digits = 3, 
+        col.names = c("Topic", "Expected topic proportion", "Top 7 terms"))
+
+#
+# Many Models 7 - init.type = "Spectral", K = 0 
+
+control <- list("nits" = 500,
+                "burnin" = 50)
+
+many_models7 <- stm(sparse_posts_txts, 
+                    init.type = "Spectral",
+                    K = 0, 
+                    verbose = TRUE)
+
+saveRDS(many_models7, "saved_data/many_models7_20181001.rds")
+
+many_models7 <- readRDS("saved_data/many_models7_20181001.rds")
+
+## Exploring the topic model
+topic_model <- many_models7
+
+td_beta <- tidy(topic_model)
+td_gamma <- tidy(topic_model, matrix = "gamma",
+                 document_names = rownames(sparse_posts_txts))
+
+top_terms <- td_beta %>%
+  arrange(beta) %>%
+  group_by(topic) %>%
+  top_n(7, beta) %>%
+  arrange(-beta) %>%
+  select(topic, term) %>%
+  summarise(terms = list(term)) %>%
+  mutate(terms = map(terms, paste, collapse = ", ")) %>% 
+  unnest()
+
+gamma_terms <- td_gamma %>%
+  group_by(topic) %>%
+  summarise(gamma = mean(gamma)) %>%
+  arrange(desc(gamma)) %>%
+  left_join(top_terms, by = "topic") %>%
+  mutate(topic = paste0("Topic ", topic),
+         topic = reorder(topic, gamma))
+
+gamma_terms %>%
+  top_n(60, gamma) %>%
+  ggplot(aes(topic, gamma, label = terms, fill = topic)) +
+  geom_col(show.legend = FALSE) +
+  geom_text(hjust = 0, nudge_y = 0.0005, size = 2.5,
             family = "IBMPlexSans") +
   coord_flip() +
   scale_y_continuous(expand = c(0,0),
