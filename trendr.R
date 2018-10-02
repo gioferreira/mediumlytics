@@ -4,7 +4,6 @@ source('src/utils/utils.R')
 library(magrittr)
 library(skimr)
 library(ggthemes)
-library(gridExtra) #pra tabela
 
 
 # Gerar a base de links a partir do endereço da revista
@@ -38,55 +37,59 @@ url_tbl <- read_rds("saved_data/url_tbl_20181002.rds")
 #                           "jsons")
 
 
-# Loaded to memmory and exported as rds
-json_list <- create_json_list("jsons")
+# # Loaded to memmory and exported as rds
+# json_list <- create_json_list("jsons")
+# 
+# write_rds(json_list, "saved_data/json_list_20181002.rds")
 
-write_rds(json_list, "saved_data/json_list_20180724.rds")
+json_list <- read_rds("saved_data/json_list_20181002.rds")
 
-# json_list <- read_rds("saved_data/json_list_20180724.rds")
-
-# Saved on 2018 07 24
+# # Saved on 2018 10 02
 # posts_list <- par_process_json_list(json_list)
 # posts_tbl <- as_tibble(do.call(rbind, posts_list))
-# write_rds(posts_tbl, "saved_data/posts_tbl_20180724.rds")
+# write_rds(posts_tbl, "saved_data/posts_tbl_20181002.rds")
 
-posts_tbl <- read_rds("saved_data/posts_tbl_20180710.rds")
+posts_tbl <- read_rds("saved_data/posts_tbl_20181002.rds")
 
-max_mentioned_users <- max(posts_tbl$mentioned_users_count)
-names_mentioned_users_id <- c()
-for(i in 1:max_mentioned_users) names_mentioned_users_id[i] <- paste0("mentioned_user_id_", i)
+# max_mentioned_users <- max(posts_tbl$mentioned_users_count)
+# names_mentioned_users_id <- c()
+# for(i in 1:max_mentioned_users) names_mentioned_users_id[i] <- paste0("mentioned_user_id_", i)
+# 
+# posts_tbl_processed <- posts_tbl %>%
+#   mutate(id = as_factor(id),
+#          user_id = as_factor(user_id),
+#          home_collection_id = as_factor(home_collection_id),
+#          detected_language = as_factor(detected_language)) %>%
+#   mutate(been_edited = ifelse((latest_published_at - first_published_at)>0, TRUE, FALSE)) %>%
+#   rename(total_clap_count = totalClapCount,
+#          tags = tags_unsplit,
+#          mentioned_users_ids = mentioned_users_ids_unsplit) %>%
+#   separate(tags, 
+#            into = c("tag_1", "tag_2", "tag_3", "tag_4", "tag_5"), 
+#            sep = ",",
+#            convert = TRUE,
+#            extra = "merge",
+#            fill = "right") %>% 
+#   mutate(tag_1 = as_factor(tag_1),
+#          tag_2 = as_factor(tag_2),
+#          tag_3 = as_factor(tag_3),
+#          tag_4 = as_factor(tag_4),
+#          tag_5 = as_factor(tag_5)) %>%
+#   select(-allow_responses,
+#          -notify_followers,
+#          -social_recommends_count) %>% 
+#   arrange_vars(c("been_edited" = 22))
+# # SpareMatrix Mentioned_Users_Ids
+# # separate(mentioned_users_ids, 
+# #          into = names_mentioned_users_id,
+# #          sep = ",",
+# #          convert = TRUE,
+# #          fill = "right") %>%
+# 
+# 
+# write_csv(posts_tbl_processed, "saved_data/posts_tbl_processed_20181002.csv")
 
-posts_tbl_processed <- posts_tbl %>%
-  mutate(id = as_factor(id),
-         user_id = as_factor(user_id),
-         home_collection_id = as_factor(home_collection_id),
-         detected_language = as_factor(detected_language)) %>%
-  mutate(been_edited = ifelse((latest_published_at - first_published_at)>0, TRUE, FALSE)) %>%
-  rename(total_clap_count = totalClapCount,
-         tags = tags_unsplit,
-         mentioned_users_ids = mentioned_users_ids_unsplit) %>%
-  separate(tags, 
-           into = c("tag_1", "tag_2", "tag_3", "tag_4", "tag_5"), 
-           sep = ",",
-           convert = TRUE,
-           extra = "merge",
-           fill = "right") %>% 
-  mutate(tag_1 = as_factor(tag_1),
-         tag_2 = as_factor(tag_2),
-         tag_3 = as_factor(tag_3),
-         tag_4 = as_factor(tag_4),
-         tag_5 = as_factor(tag_5)) %>%
-  select(-allow_responses,
-         -notify_followers,
-         -social_recommends_count) %>% 
-  arrange_vars(c("been_edited" = 22))
-# SpareMatrix Mentioned_Users_Ids
-# separate(mentioned_users_ids, 
-#          into = names_mentioned_users_id,
-#          sep = ",",
-#          convert = TRUE,
-#          fill = "right") %>%
-
+posts_tbl_processed <- read_csv("saved_data/posts_tbl_processed_20181002.csv")
 
 posts_tbl_processed %>% skim()
 
