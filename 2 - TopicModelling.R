@@ -46,121 +46,80 @@ sparse_posts_txts <- tidy_posts_txts %>%
 # dfm_posts_txts <- tidy_posts_txts %>%
 #   count(id, word, sort = TRUE) %>%
 #   cast_dfm(id, word, n)
+# 
+# # Many Models 6
+# ## Playing with control parameter for stm
+# 
+# plan(cluster)
+# 
+# control <- list("nits" = 500,
+#                 "burnin" = 50)
+# 
+# many_models6 <- data_frame(K = seq(2, 50, 2)) %>%
+#   mutate(topic_model = future_map(K, 
+#                                   ~stm(sparse_posts_txts, 
+#                                        K = ., 
+#                                        verbose = TRUE,
+#                                        init.type = "LDA",
+#                                        control = control), 
+#                                   .progress = TRUE))
+# 
+# saveRDS(many_models6, "saved_data/many_models6_20181001b.rds")
+# 
+# many_models6 <- readRDS("saved_data/many_models6_20181001b.rds")
+# heldout <- make.heldout(sparse_posts_txts)
+# 
+# k_result <- many_models6 %>%
+#   mutate(exclusivity = map(topic_model, exclusivity),
+#          semantic_coherence = map(topic_model, semanticCoherence, sparse_posts_txts),
+#          eval_heldout = map(topic_model, eval.heldout, heldout$missing),
+#          residual = map(topic_model, checkResiduals, sparse_posts_txts),
+#          bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),
+#          lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),
+#          lbound = bound + lfact,
+#          iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
+# 
+# k_result %>%
+#   transmute(K,
+#             `Lower bound` = lbound,
+#             Residuals = map_dbl(residual, "dispersion"),
+#             `Semantic coherence` = map_dbl(semantic_coherence, mean),
+#             `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%
+#   gather(Metric, Value, -K) %>%
+#   ggplot(aes(K, Value, color = Metric)) +
+#   geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +
+#   facet_wrap(~Metric, scales = "free_y") +
+#   labs(x = "K (number of topics)",
+#        y = NULL,
+#        title = "Model diagnostics by number of topics",
+#        subtitle = "Searching for the magical K")
+# 
+# ggsave("plots/many_models6b.pdf",
+#        width = 19.2,
+#        height = 10.8,
+#        units = "cm")
+# 
+# ## Follow up evaluation using Many_Models6b with 4, 10, 18, 34, 38, 46 topics.
+# 
+# k_result %>%
+#   select(K, exclusivity, semantic_coherence) %>%
+#   filter(K %in% c(18, 24, 34, 38, 46)) %>%
+#   unnest() %>%
+#   mutate(K = as.factor(K)) %>%
+#   ggplot(aes(semantic_coherence, exclusivity, color = K)) +
+#   geom_point(size = 2, alpha = 0.7) +
+#   labs(x = "Semantic coherence",
+#        y = "Exclusivity",
+#        title = "Comparing exclusivity and semantic coherence",
+#        subtitle = "Models with fewer topics have higher semantic coherence for more topics, but lower exclusivity")
+# 
+# saveRDS(k_result, "saved_data/k_result_models6_20181001b.rds")
 
-plan(cluster)
-
-many_models5 <- data_frame(K = seq(2, 50, 2)) %>%
-  mutate(topic_model = future_map(K, 
-                                  ~stm(sparse_posts_txts, 
-                                       K = ., 
-                                       verbose = FALSE,
-                                       init.type = "LDA"), 
-                                  .progress = TRUE))
-
-saveRDS(many_models5, "saved_data/many_models5_20180930.rds")
-
-heldout <- make.heldout(sparse_posts_txts)
-
-k_result <- many_models5 %>%
-  mutate(exclusivity = map(topic_model, exclusivity),
-         semantic_coherence = map(topic_model, semanticCoherence, sparse_posts_txts),
-         eval_heldout = map(topic_model, eval.heldout, heldout$missing),
-         residual = map(topic_model, checkResiduals, sparse_posts_txts),
-         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),
-         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),
-         lbound = bound + lfact,
-         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
-
-k_result %>%
-  transmute(K,
-            `Lower bound` = lbound,
-            Residuals = map_dbl(residual, "dispersion"),
-            `Semantic coherence` = map_dbl(semantic_coherence, mean),
-            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%
-  gather(Metric, Value, -K) %>%
-  ggplot(aes(K, Value, color = Metric)) +
-  geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +
-  facet_wrap(~Metric, scales = "free_y") +
-  labs(x = "K (number of topics)",
-       y = NULL,
-       title = "Model diagnostics by number of topics",
-       subtitle = "Searching for the magical K")
-
-ggsave("plots/many_models5.pdf",
-       width = 19.2,
-       height = 10.8,
-       units = "cm")
-
-
-# Many Models 6
-## Playing with control parameter for stm
-
-plan(cluster)
-
-control <- list("nits" = 500,
-                "burnin" = 50)
-
-many_models6 <- data_frame(K = seq(2, 50, 2)) %>%
-  mutate(topic_model = future_map(K, 
-                                  ~stm(sparse_posts_txts, 
-                                       K = ., 
-                                       verbose = TRUE,
-                                       init.type = "LDA",
-                                       control = control), 
-                                  .progress = TRUE))
-
-saveRDS(many_models6, "saved_data/many_models6_20181001b.rds")
-
-heldout <- make.heldout(sparse_posts_txts)
-
-k_result <- many_models6 %>%
-  mutate(exclusivity = map(topic_model, exclusivity),
-         semantic_coherence = map(topic_model, semanticCoherence, sparse_posts_txts),
-         eval_heldout = map(topic_model, eval.heldout, heldout$missing),
-         residual = map(topic_model, checkResiduals, sparse_posts_txts),
-         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),
-         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),
-         lbound = bound + lfact,
-         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
-
-k_result %>%
-  transmute(K,
-            `Lower bound` = lbound,
-            Residuals = map_dbl(residual, "dispersion"),
-            `Semantic coherence` = map_dbl(semantic_coherence, mean),
-            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%
-  gather(Metric, Value, -K) %>%
-  ggplot(aes(K, Value, color = Metric)) +
-  geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +
-  facet_wrap(~Metric, scales = "free_y") +
-  labs(x = "K (number of topics)",
-       y = NULL,
-       title = "Model diagnostics by number of topics",
-       subtitle = "Searching for the magical K")
-
-ggsave("plots/many_models6b.pdf",
-       width = 19.2,
-       height = 10.8,
-       units = "cm")
-
-## Follow up evaluation using Many_Models6b with 2, 10, 16, 24, 28, 42 topics.
-
-k_result %>%
-  select(K, exclusivity, semantic_coherence) %>%
-  filter(K %in% c(2, 10, 16, 24, 28, 42)) %>%
-  unnest() %>%
-  mutate(K = as.factor(K)) %>%
-  ggplot(aes(semantic_coherence, exclusivity, color = K)) +
-  geom_point(size = 2, alpha = 0.7) +
-  labs(x = "Semantic coherence",
-       y = "Exclusivity",
-       title = "Comparing exclusivity and semantic coherence",
-       subtitle = "Models with fewer topics have higher semantic coherence for more topics, but lower exclusivity")
-
-## Extracting topic_model with 24 topics
+## Extracting topic_model with 34 topics from 
+k_result <- readRDS("saved_data/k_result_models6_20181001b.rds")
 
 topic_model <- k_result %>% 
-  filter(K == 24) %>% 
+  filter(K == 34) %>% 
   pull(topic_model) %>% 
   .[[1]]
 
@@ -191,7 +150,7 @@ gamma_terms <- td_gamma %>%
          topic = reorder(topic, gamma))
 
 gamma_terms %>%
-  top_n(24, gamma) %>%
+  top_n(20, gamma) %>%
   ggplot(aes(topic, gamma, label = terms, fill = topic)) +
   geom_col(show.legend = FALSE) +
   geom_text(hjust = 0, nudge_y = 0.0005, size = 3,
@@ -205,7 +164,7 @@ gamma_terms %>%
                                   family="IBMPlexSans-Bold"),
         plot.subtitle = element_text(size = 13)) +
   labs(x = NULL, y = expression(gamma),
-       title = "Top 20 topics by prevalence in the Hacker News corpus",
+       title = "Top 20 topics by prevalence",
        subtitle = "With the top words that contribute to each topic")
 
 
