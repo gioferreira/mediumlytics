@@ -31,7 +31,14 @@ processed_txts <- textProcessor(posts_txts$text,
                                 language = "pt",
                                 customstopwords = stop_words_total)
 
-out <- prepDocuments(processed_txts$documents, processed_txts$vocab, processed_txts$meta)
+out <- prepDocuments(processed_txts$documents, processed_txts$vocab, processed_txts$meta, lower.thresh = 25)
 docs <- out$documents
 vocab <- out$vocab
 meta <- out$meta
+
+spectral_init <- stm(documents = docs,
+                     vocab = vocab,
+                     K = 0,
+                     prevalence = ~ user_id + s(day_published),
+                     data = meta,
+                     init.type = "Spectral")
