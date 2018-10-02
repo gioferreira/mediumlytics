@@ -232,3 +232,5 @@ gamma_terms %>%
   select(topic, gamma, terms) %>%
   kable(digits = 3, 
         col.names = c("Topic", "Expected topic proportion", "Top 7 terms"))
+
+
