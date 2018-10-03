@@ -63,6 +63,42 @@ many_models_20181002 <- data_frame(K = seq(2, 74, 2)) %>%
 
 saveRDS(many_models_20181002, "saved_data/many_models_20181002.rds")
 
+# Many Models Evaluation
+many_models_20181002 <- readRDS("saved_data/many_models_20181002.rds")
+heldout <- make.heldout(documents = docs,
+                        vocab = vocab)
+
+k_result <- many_models_20181002 %>%
+  mutate(exclusivity = map(topic_model, exclusivity),
+         semantic_coherence = map(topic_model, semanticCoherence, docs),
+         eval_heldout = map(topic_model, eval.heldout, heldout$missing),
+         residual = map(topic_model, checkResiduals, docs),
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),
+         lbound = bound + lfact,
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
+
+k_result %>%
+  filter(K <= 42) %>%
+  transmute(K,
+            `Lower bound` = lbound,
+            Residuals = map_dbl(residual, "dispersion"),
+            `Semantic coherence` = map_dbl(semantic_coherence, mean),
+            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%
+  gather(Metric, Value, -K) %>%
+  ggplot(aes(K, Value, color = Metric)) +
+  geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +
+  facet_wrap(~Metric, scales = "free_y") +
+  labs(x = "K (number of topics)",
+       y = NULL,
+       title = "Model diagnostics by number of topics",
+       subtitle = "Searching for the magical K: Range 2 to 42")
+
+ggsave("plots/many_models_20181002-2to42.pdf",
+       width = 19.2,
+       height = 10.8,
+       units = "cm")
+
 # Comment on this: https://github.com/bstewart/stm/issues/152
 # read: http://www.periodicos.letras.ufmg.br/index.php/relin/article/view/8916/8803
 # read: https://estudogeral.sib.uc.pt/bitstream/10316/35724/1/Semantic%20Topic%20Modelling.pdf
