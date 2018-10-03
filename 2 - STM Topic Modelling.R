@@ -5,8 +5,9 @@ library(stm)
 library(tidyverse)
 library(skimr)
 library(lubridate)
+library(furrr)
 
-posts_tbl_processed <- read_csv("saved_data/posts_tbl_processed_20180930.csv")
+posts_tbl_processed <- read_csv("saved_data/posts_tbl_processed_20181002.csv")
 
 posts_txts <- posts_tbl_processed %>%
   select(id,
@@ -49,7 +50,7 @@ saveRDS(spectral_init, "saved_data/spectral_init_k0_20181002.rds")
 # Use Tidy Text Method to model stm with different Ks and choosing the best one
 plan(cluster)
 
-many_models_20181002 <- data_frame(K = seq(6, 70, 2)) %>%
+many_models_20181002 <- data_frame(K = seq(2, 74, 2)) %>%
   mutate(topic_model = future_map(K,
                                   ~stm(documents = docs,
                                        vocab = vocab,
@@ -62,3 +63,6 @@ many_models_20181002 <- data_frame(K = seq(6, 70, 2)) %>%
 
 saveRDS(many_models_20181002, "saved_data/many_models_20181002.rds")
 
+# Comment on this: https://github.com/bstewart/stm/issues/152
+# read: http://www.periodicos.letras.ufmg.br/index.php/relin/article/view/8916/8803
+# read: https://estudogeral.sib.uc.pt/bitstream/10316/35724/1/Semantic%20Topic%20Modelling.pdf
