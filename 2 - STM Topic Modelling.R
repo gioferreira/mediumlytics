@@ -134,7 +134,7 @@ topic_model_54 <- k_result %>%
 
 ## Exploring the topic models
 
-topic_model <- topic_model_54
+topic_model <- topic_model_22
 
 td_beta <- tidy(topic_model)
 td_gamma <- tidy(topic_model, matrix = "gamma",
@@ -162,6 +162,9 @@ gamma_terms %>%
   select(topic, gamma, terms) %>%
   kable(digits = 3, 
         col.names = c("Topic", "Expected topic proportion", "Top 7 terms"))
+
+labelTopics(topic_model, c(1, 6, 5, 3, 21, 7))
+findThoughts(model = topic_model, texts = meta$user_id, topics = c(1, 6, 3, 7))
 
 # Comment on this: https://github.com/bstewart/stm/issues/152
 # read: http://www.periodicos.letras.ufmg.br/index.php/relin/article/view/8916/8803
