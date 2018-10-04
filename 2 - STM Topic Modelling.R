@@ -12,11 +12,15 @@ library(ggthemes)
 
 posts_tbl_processed <- read_csv("saved_data/posts_tbl_processed_20181002.csv")
 
+# 2018 10 04 Retrain the STM including Tag_1 as Meta
+
 posts_txts <- posts_tbl_processed %>%
   select(id,
          user_id,
          first_published_at,
+         tag_1,
          text) %>%
+  filter(!is.na(tag_1)) %>%
   mutate(first_published_at = floor_date(first_published_at, "days"),
          day_published = as.integer((first_published_at + days(1)) - min(first_published_at))) %>%
   select(-first_published_at) %>%
@@ -35,59 +39,64 @@ processed_txts <- textProcessor(posts_txts$text,
                                 language = "pt",
                                 customstopwords = stop_words_total)
 
-out <- prepDocuments(processed_txts$documents, processed_txts$vocab, processed_txts$meta, lower.thresh = 25)
+out <- prepDocuments(processed_txts$documents, 
+                     processed_txts$vocab, 
+                     processed_txts$meta, 
+                     lower.thresh = 25)
+
 docs <- out$documents
 vocab <- out$vocab
 meta <- out$meta
 
-# # Use spectral init with k = 0 to search for the ideal K
-# spectral_init <- stm(documents = docs,
-#                      vocab = vocab,
-#                      K = 0,
-#                      prevalence = ~ user_id + s(day_published),
-#                      data = meta,
-#                      init.type = "Spectral")
-# 
-# saveRDS(spectral_init, "saved_data/spectral_init_k0_20181002.rds")
+# Use spectral init with k = 0 to search for the ideal K
+spectral_init <- stm(documents = docs,
+                     vocab = vocab,
+                     K = 0,
+                     prevalence = ~ user_id + tag_1 + s(day_published),
+                     data = meta,
+                     init.type = "Spectral")
 
-# # Use Tidy Text Method to model stm with different Ks and choosing the best one
-# plan(cluster)
-# 
-# many_models_20181002 <- data_frame(K = seq(2, 74, 2)) %>%
-#   mutate(topic_model = future_map(K,
-#                                   ~stm(documents = docs,
-#                                        vocab = vocab,
-#                                        K = .,
-#                                        prevalence = ~ user_id + s(day_published),
-#                                        data = meta, 
-#                                        verbose = TRUE,
-#                                        init.type = "Spectral"),
-#                                   .progress = TRUE))
-# 
-# saveRDS(many_models_20181002, "saved_data/many_models_20181002.rds")
+saveRDS(spectral_init, "saved_data/spectral_init_k0_20181004_add_tag1.rds")
+
+# Use Tidy Text Method to model stm with different Ks and choosing the best one
+# Re renuning wigh tag as meta
+plan(cluster)
+
+many_models_20181004 <- data_frame(K = seq(2, 74, 2)) %>%
+  mutate(topic_model = future_map(K,
+                                  ~stm(documents = docs,
+                                       vocab = vocab,
+                                       K = .,
+                                       prevalence = ~ user_id + tag_1 + s(day_published),
+                                       data = meta,
+                                       verbose = TRUE,
+                                       init.type = "Spectral"),
+                                  .progress = TRUE))
+
+saveRDS(many_models_20181004, "saved_data/many_models_20181004_add_tag1.rds")
 
 # Many Models Evaluation
-many_models_20181002 <- readRDS("saved_data/many_models_20181002.rds")
+many_models_20181004 <- readRDS("saved_data/many_models_20181004_add_tag1.rds")
 heldout <- make.heldout(documents = docs,
                         vocab = vocab)
 
-# k_result <- many_models_20181002 %>%
-#   mutate(exclusivity = map(topic_model, exclusivity),
-#          semantic_coherence = map(topic_model, semanticCoherence, docs),
-#          eval_heldout = map(topic_model, eval.heldout, heldout$missing),
-#          residual = map(topic_model, checkResiduals, docs),
-#          bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),
-#          lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),
-#          lbound = bound + lfact,
-#          iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
-# 
-# saveRDS(k_result, "saved_data/k_result_many_models_20181002.rds")
-k_result <- read_rds("saved_data/k_result_many_models_20181002.rds")
+k_result <- many_models_20181004 %>%
+  mutate(exclusivity = map(topic_model, exclusivity),
+         semantic_coherence = map(topic_model, semanticCoherence, docs),
+         eval_heldout = map(topic_model, eval.heldout, heldout$missing),
+         residual = map(topic_model, checkResiduals, docs),
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),
+         lbound = bound + lfact,
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
+
+saveRDS(k_result, "saved_data/k_result_many_models_20181004_add_tag1.rds")
+k_result <- read_rds("saved_data/k_result_many_models_20181004_add_tag1.rds")
 
 k_result %>%
-  filter(K !=46,
-         K != 66,
-         K != 72) %>%
+  # filter(K !=46,
+  #        K != 66,
+  #        K != 72) %>%
   transmute(K,
             `Lower bound` = lbound,
             Residuals = map_dbl(residual, "dispersion"),
@@ -101,9 +110,9 @@ k_result %>%
   labs(x = "K (number of topics)",
        y = NULL,
        title = "Model diagnostics by number of topics",
-       subtitle = "Searching for the magical K: Range 2 to 42")
+       subtitle = "Searching for the magical K")
 
-ggsave("plots/many_models_20181002-2to42.pdf",
+ggsave("plots/many_models_20181004.pdf",
        width = 19.2,
        height = 10.8,
        units = "cm")
@@ -134,7 +143,7 @@ topic_model_54 <- k_result %>%
 
 ## Exploring the topic models
 
-topic_model <- topic_model_22
+topic_model <- spectral_init
 
 td_beta <- tidy(topic_model)
 td_gamma <- tidy(topic_model, matrix = "gamma",
