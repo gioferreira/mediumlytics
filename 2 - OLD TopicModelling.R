@@ -122,7 +122,6 @@ topic_model <- k_result %>%
 topic_model
 
 ## Exploring the topic model
-
 td_beta <- tidy(topic_model)
 td_gamma <- tidy(topic_model, matrix = "gamma",
                  document_names = rownames(sparse_posts_txts))
