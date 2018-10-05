@@ -19,12 +19,14 @@ posts_txts <- posts_tbl_processed %>%
          user_id,
          first_published_at,
          tag_1,
-         text) %>%
+         text,
+         word_count) %>%
   filter(!is.na(tag_1),
-         nchar(tag_1 > 2)) %>%
+         nchar(tag_1) > 2,
+         word_count >= 3) %>%
   mutate(first_published_at = floor_date(first_published_at, "days"),
          day_published = as.integer((first_published_at + days(1)) - min(first_published_at))) %>%
-  select(-first_published_at) %>%
+  select(-first_published_at, -word_count) %>%
   arrange_vars(c("day_published" = 3))
 
 stop_words <- read_lines("saved_data/final_stopwords.txt")
