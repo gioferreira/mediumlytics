@@ -63,7 +63,7 @@ meta <- out$meta
 spectral_init <- read_rds("saved_data/spectral_init_k0_20181004_add_tag1.rds")
 # Use Tidy Text Method to model stm with different Ks and choosing the best one
 # Re renuning wigh tag as meta
-plan(cluster)
+plan(multiprocess)
 
 many_models_20181004 <- data_frame(K = seq(2, 74, 2)) %>%
   mutate(topic_model = future_map(K,
