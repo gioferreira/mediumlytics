@@ -182,3 +182,4 @@ findThoughts(model = topic_model, texts = meta$user_id, topics = c(1, 6, 3, 7))
 # Comment on this: https://github.com/bstewart/stm/issues/152
 # read: http://www.periodicos.letras.ufmg.br/index.php/relin/article/view/8916/8803
 # read: https://estudogeral.sib.uc.pt/bitstream/10316/35724/1/Semantic%20Topic%20Modelling.pdf
+# read: https://github.com/bstewart/stm/issues/159
