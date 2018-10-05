@@ -48,16 +48,19 @@ docs <- out$documents
 vocab <- out$vocab
 meta <- out$meta
 
-# Use spectral init with k = 0 to search for the ideal K
-spectral_init <- stm(documents = docs,
-                     vocab = vocab,
-                     K = 0,
-                     prevalence = ~ user_id + tag_1 + s(day_published),
-                     data = meta,
-                     init.type = "Spectral")
+# # Use spectral init with k = 0 to search for the ideal K
+# spectral_init <- stm(documents = docs,
+#                      vocab = vocab,
+#                      K = 0,
+#                      prevalence = ~ user_id + tag_1 + s(day_published),
+#                      data = meta,
+#                      init.type = "Spectral",
+#                      gamma.prior = "L1")
+# 
+# saveRDS(spectral_init, "saved_data/spectral_init_k0_20181004_add_tag1.rds")
 
-saveRDS(spectral_init, "saved_data/spectral_init_k0_20181004_add_tag1.rds")
 
+spectral_init <- read_rds("saved_data/spectral_init_k0_20181004_add_tag1.rds")
 # Use Tidy Text Method to model stm with different Ks and choosing the best one
 # Re renuning wigh tag as meta
 plan(cluster)
@@ -70,7 +73,8 @@ many_models_20181004 <- data_frame(K = seq(2, 74, 2)) %>%
                                        prevalence = ~ user_id + tag_1 + s(day_published),
                                        data = meta,
                                        verbose = TRUE,
-                                       init.type = "Spectral"),
+                                       init.type = "Spectral",
+                                       gamma.prior = "L1"),
                                   .progress = TRUE))
 
 saveRDS(many_models_20181004, "saved_data/many_models_20181004_add_tag1.rds")
