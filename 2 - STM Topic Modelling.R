@@ -22,8 +22,8 @@ posts_txts <- posts_tbl_processed %>%
          text,
          word_count) %>%
   filter(!is.na(tag_1),
-         nchar(tag_1) > 2,
-         word_count >= 3) %>%
+         nchar(tag_1) > 3,
+         word_count >= 20) %>%
   mutate(first_published_at = floor_date(first_published_at, "days"),
          day_published = as.integer((first_published_at + days(1)) - min(first_published_at))) %>%
   select(-first_published_at, -word_count) %>%
@@ -68,7 +68,7 @@ spectral_init <- read_rds("saved_data/spectral_init_k0_20181004_add_tag1.rds")
 # Re renuning wigh tag as meta
 plan(cluster)
 
-many_models_20181004 <- data_frame(K = seq(2, 74, 2)) %>%
+many_models_20181004 <- data_frame(K = seq(2, 74, 4)) %>%
   mutate(topic_model = future_map(K,
                                   ~stm(documents = docs,
                                        vocab = vocab,
