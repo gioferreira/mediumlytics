@@ -1,6 +1,7 @@
 source('src/scrapeMedium.R')
 source('src/utils/utils.R')
 
+library(tidyverse)
 library(magrittr)
 library(skimr)
 library(ggthemes)
@@ -17,39 +18,39 @@ scrape_url <- "https://medium.com/neworder"
 # 
 # url_tbl <- parse_first(content_json, scrape_url = scrape_url)
 # 
-# #ReScraped on 2018 07 24 (new url neworder)
+# #ReScraped on 2019 01 01
 # url_tbl <- rbind(url_tbl, scrape_more(content_json, scrape_url))
 # 
-# write_rds(url_tbl, "saved_data/url_tbl_20181002.rds")
+# write_rds(url_tbl, "saved_data/url_tbl_20190101.rds")
 
 # Read Saved url_tbl
-url_tbl <- read_rds("saved_data/url_tbl_20181002.rds")
+url_tbl <- read_rds("saved_data/url_tbl_20190101.rds")
 
-# already downloaded as of 2019 10 02 
+# already downloaded as of 2019 01 01 
 #################################################################################
 ## I used only the id + scrapeurl for the download json URL                    ##
 ## But I could use the real url with this "remove accents" line:               ##
 ## gsub("(`|\\'|~|\\^)", "",iconv(url_tbl$url[[i]], to="ASCII//TRANSLIT"))     ##
 #################################################################################
 
-# url_tbl <- download_jsons(url_tbl,
-#                           scrape_url,
-#                           "jsons")
+url_tbl <- download_jsons(url_tbl,
+                          scrape_url,
+                          "jsons")
 
 
 # # Loaded to memmory and exported as rds
 # json_list <- create_json_list("jsons")
 # 
-# write_rds(json_list, "saved_data/json_list_20181002.rds")
+# write_rds(json_list, "saved_data/json_list_20190101.rds")
 
-json_list <- read_rds("saved_data/json_list_20181002.rds")
+json_list <- read_rds("saved_data/json_list_20190101.rds")
 
-# # Saved on 2018 10 02
+# # Saved on 2019 01 01
 # posts_list <- par_process_json_list(json_list)
 # posts_tbl <- as_tibble(do.call(rbind, posts_list))
-# write_rds(posts_tbl, "saved_data/posts_tbl_20181002.rds")
+# write_rds(posts_tbl, "saved_data/posts_tbl_20190101.rds")
 
-posts_tbl <- read_rds("saved_data/posts_tbl_20181002.rds")
+posts_tbl <- read_rds("saved_data/posts_tbl_20190101.rds")
 
 # max_mentioned_users <- max(posts_tbl$mentioned_users_count)
 # names_mentioned_users_id <- c()
@@ -64,12 +65,12 @@ posts_tbl <- read_rds("saved_data/posts_tbl_20181002.rds")
 #   rename(total_clap_count = totalClapCount,
 #          tags = tags_unsplit,
 #          mentioned_users_ids = mentioned_users_ids_unsplit) %>%
-#   separate(tags, 
-#            into = c("tag_1", "tag_2", "tag_3", "tag_4", "tag_5"), 
+#   separate(tags,
+#            into = c("tag_1", "tag_2", "tag_3", "tag_4", "tag_5"),
 #            sep = ",",
 #            convert = TRUE,
 #            extra = "merge",
-#            fill = "right") %>% 
+#            fill = "right") %>%
 #   mutate(tag_1 = as_factor(tag_1),
 #          tag_2 = as_factor(tag_2),
 #          tag_3 = as_factor(tag_3),
@@ -77,19 +78,19 @@ posts_tbl <- read_rds("saved_data/posts_tbl_20181002.rds")
 #          tag_5 = as_factor(tag_5)) %>%
 #   select(-allow_responses,
 #          -notify_followers,
-#          -social_recommends_count) %>% 
+#          -social_recommends_count) %>%
 #   arrange_vars(c("been_edited" = 22))
 # # SpareMatrix Mentioned_Users_Ids
-# # separate(mentioned_users_ids, 
+# # separate(mentioned_users_ids,
 # #          into = names_mentioned_users_id,
 # #          sep = ",",
 # #          convert = TRUE,
 # #          fill = "right") %>%
 # 
 # 
-# write_csv(posts_tbl_processed, "saved_data/posts_tbl_processed_20181002.csv")
+# write_rds(posts_tbl_processed, "saved_data/posts_tbl_processed_20190101.rds")
 
-posts_tbl_processed <- read_csv("saved_data/posts_tbl_processed_20181002.csv")
+posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20190101.rds")
 
 posts_tbl_processed %>% skim()
 
