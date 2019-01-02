@@ -88,6 +88,18 @@ ggsave("plots/03-Posts-per-author.png",
        units = "cm",
        dpi = 300)
 
+# Word Count
+posts_tbl_processed %>% #filter(word_count>500 & word_count < 1250)
+  ggplot(aes(x = word_count)) +
+  geom_histogram(binwidth = 250) +
+  scale_x_continuous(breaks = seq(0, 
+                                  max(posts_tbl_processed$word_count), 
+                                  by = 250)) +
+  labs(title = "Distribuição do Número de Palavras por Post") +
+  theme_tufte() +
+  theme(axis.title = element_blank(),
+        axis.text.x = element_text(angle = 90, hjust = 1))
+
 # Uso de Tags: Tags Count Hist, Tag mais Frequente
 
 # Image Count hist
@@ -114,18 +126,6 @@ posts_tbl_processed %>%
   theme_tufte() +
   theme(axis.title = element_blank())
 
-# Word Count
-posts_tbl_processed %>% #filter(word_count>500 & word_count < 1250)
-  ggplot(aes(x = word_count)) +
-  geom_histogram(binwidth = 250) +
-  scale_x_continuous(breaks = seq(0, 
-                                  max(posts_tbl_processed$word_count), 
-                                  by = 250)) +
-  labs(title = "Distribuição do Número de Palavras por Post") +
-  theme_tufte() +
-  theme(axis.title = element_blank(),
-  axis.text.x = element_text(angle = 90, hjust = 1))
-  # gghighlight(word_count >= 778)
 
 # Recommends Hist e explicação (unique clappers)
 posts_tbl_processed %>% #filter(word_count>500 & word_count < 1250)
