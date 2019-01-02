@@ -95,10 +95,16 @@ posts_tbl_processed %>% #filter(word_count>500 & word_count < 1250)
   scale_x_continuous(breaks = seq(0, 
                                   max(posts_tbl_processed$word_count), 
                                   by = 250)) +
-  labs(title = "Distribuição do Número de Palavras por Post") +
+  labs(title = "Distribuição do Número de Palavras por Post\n") +
   theme_tufte() +
   theme(axis.title = element_blank(),
-        axis.text.x = element_text(angle = 90, hjust = 1))
+        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+
+ggsave("plots/04-word_count_hist.png",
+       width = 21,
+       height = 14.85,
+       units = "cm",
+       dpi = 300)
 
 # Uso de Tags: Tags Count Hist, Tag mais Frequente
 
