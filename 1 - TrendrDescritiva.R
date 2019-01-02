@@ -153,17 +153,38 @@ ggsave("plots/06-image_count.png",
        units = "cm",
        dpi = 300)
 
-# Links Count hist
-# Curiosamente essa segue uma Zipf Distribution
+# Links Count
 posts_tbl_processed %>%
   ggplot(aes(x = links_count)) +
   geom_histogram(bins = max(posts_tbl_processed$links_count)) +
   scale_x_continuous(breaks = seq(0, 
                                   max(posts_tbl_processed$links_count), 
-                                  by = 5)) +
-  labs(title = "Distribuição do Número de Links por Post") +
+                                  by = 3)) +
+  labs(title = "Distribuição do Número de Links por Post\n") +
   theme_tufte() +
   theme(axis.title = element_blank())
+
+ggsave("plots/07-links_count.png",
+       width = 21,
+       height = 14.85,
+       units = "cm",
+       dpi = 300)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # Recommends Hist e explicação (unique clappers)
