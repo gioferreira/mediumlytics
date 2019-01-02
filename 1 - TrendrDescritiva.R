@@ -117,7 +117,7 @@ posts_tbl_processed %>%
 # Word Count
 posts_tbl_processed %>% #filter(word_count>500 & word_count < 1250)
   ggplot(aes(x = word_count)) +
-  geom_histogram(bins = 41) +
+  geom_histogram(binwidth = 250) +
   scale_x_continuous(breaks = seq(0, 
                                   max(posts_tbl_processed$word_count), 
                                   by = 250)) +
