@@ -3,11 +3,11 @@
 
 source('src/utils/utils.R')
 
-library(tidyverse)
+library(gridExtra) #pra tabela
 library(magrittr)
+library(tidyverse)
 library(skimr)
 library(ggthemes)
-library(gridExtra) #pra tabela
 library(lubridate)
 library(scales)
 library(gghighlight)
@@ -21,18 +21,23 @@ posts_tbl_processed %>% skim()
 # Total de posts por mês
 posts_tbl_processed %>%
   group_by(day_published = as_date(floor_date(first_published_at, "1 month"))) %>%
-  filter(day_published > "2012-12-31",
-         day_published < "2018-07-01") %>%
-  tally() %>%
-  # mutate(day_published = as_date(day_published)) %>%
+  tally() %>% 
   ggplot(mapping = aes(x = day_published, y = n)) +
   geom_bar(stat = "identity") +
-  geom_text(aes(label = n, angle = 90), size = 3.25, nudge_y = 4.5, check_overlap = TRUE) +
+  geom_text(aes(label = n, angle = 90), size = 2.75, nudge_y = 4.5, check_overlap = TRUE) +
   ggtitle("Total de posts por mês") +
-  scale_x_date(date_breaks = "3 months", labels = date_format("%b-%Y")) +
+  scale_x_date(date_breaks = "1 year", 
+               labels = date_format("%Y"),
+               expand = expand_scale(mult = c(0.01, 0.02))) +
   theme_tufte() +
   theme(axis.title = element_blank(),
-        axis.text.x = element_text(angle = 60, hjust = 1))
+        axis.text.x = element_text(angle = 0, hjust = 0.5))
+
+ggsave("plots/01-Total-by-month.png",
+       width = 21,
+       height = 14.85,
+       units = "cm",
+       dpi = 300)
 
 # Autores Únicos por mês
 posts_tbl_processed %>%
