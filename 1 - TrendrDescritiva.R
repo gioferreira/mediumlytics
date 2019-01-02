@@ -60,7 +60,6 @@ ggsave("plots/02-Authors-by-month.png",
        units = "cm",
        dpi = 300)
 
-
 # Média de posts por autor
 posts_tbl_processed %>%
   group_by(day_published = as_date(floor_date(first_published_at, "1 month"))) %>%
@@ -75,13 +74,19 @@ posts_tbl_processed %>%
             size = 2.75, 
             nudge_y = .18, 
             check_overlap = TRUE) +
-  ggtitle("Média de Posts por Autorn") +
+  ggtitle("Média de Posts por Autor\n") +
   scale_x_date(date_breaks = "1 year", 
                labels = date_format("%Y"),
                expand = expand_scale(mult = c(0.01, 0.02))) +
   theme_tufte() +
   theme(axis.title = element_blank(),
         axis.text.x = element_text(angle = 0, hjust = .5))
+
+ggsave("plots/03-Posts-per-author.png",
+       width = 21,
+       height = 14.85,
+       units = "cm",
+       dpi = 300)
 
 # Uso de Tags: Tags Count Hist, Tag mais Frequente
 
