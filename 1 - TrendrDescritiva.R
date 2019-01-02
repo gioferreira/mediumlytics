@@ -170,37 +170,55 @@ ggsave("plots/07-links_count.png",
        units = "cm",
        dpi = 300)
 
+# Total Clap Count Hist
+posts_tbl_processed %>%
+  ggplot(aes(x = total_clap_count)) +
+  geom_histogram(binwidth = 50) +
+  scale_x_continuous(breaks = seq(0, 
+                                  max(posts_tbl_processed$total_clap_count), 
+                                  by = 500)) +
+  labs(title = "Distribuição do Número de Palmas por Texto\n") +
+  theme_tufte() +
+  theme(axis.title = element_blank())
 
+ggsave("plots/08-total_clap_count.png",
+       width = 21,
+       height = 14.85,
+       units = "cm",
+       dpi = 300)
 
+# Total Clap Count Hist filtered
+posts_tbl_processed %>%
+  filter(total_clap_count <= 500) %>%
+  ggplot(aes(x = total_clap_count)) +
+  geom_histogram(binwidth = 10) +
+  scale_x_continuous(breaks = seq(0, 
+                                  max(posts_tbl_processed$total_clap_count), 
+                                  by = 100)) +
+  labs(title = "Distribuição do Número de Palmas por Texto",
+       subtitle = "Considerando apenas textos com menos de 500 Palmas") +
+  theme_tufte() +
+  theme(axis.title = element_blank())
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ggsave("plots/08b-total_clap_count_filtered.png",
+       width = 21,
+       height = 14.85,
+       units = "cm",
+       dpi = 300)
 
 
 # Recommends Hist e explicação (unique clappers)
-posts_tbl_processed %>% #filter(word_count>500 & word_count < 1250)
+posts_tbl_processed %>% filter(recommends <= 300) %>% #filter(word_count>500 & word_count < 1250)
   ggplot(aes(x = recommends)) +
-  geom_histogram(bins = 35) +
+  geom_histogram(binwidth = 5) +
   scale_x_continuous(breaks = seq(0, 
                                   max(posts_tbl_processed$recommends), 
-                                  by = 75)) +
+                                  by = 5)) +
   labs(title = "Distribuição de Recommends por Post") +
   theme_tufte() +
   theme(axis.title = element_blank(),
         axis.text.x = element_text(angle = 90, hjust = 1))
-# Total Clap Count Hist
+
 # Responses Created Count Hist
 
 
