@@ -42,14 +42,14 @@ ggsave("plots/01-Total-by-month.png",
 # Autores Únicos por mês
 posts_tbl_processed %>%
   group_by(day_published = as_date(floor_date(first_published_at, "1 month"))) %>%
-  filter(day_published > "2012-12-31",
-         day_published < "2018-07-01") %>%
   summarise(count = n_distinct(user_id)) %>%
   ggplot(mapping = aes(x = day_published, y = count)) +
   geom_bar(stat = "identity") +
-  geom_text(aes(label = count, angle = 90), size = 3.25, nudge_y = 2, check_overlap = TRUE) +
-  ggtitle("Autores únicos por mês") +
-  scale_x_date(date_breaks = "3 months", labels = date_format("%b-%Y")) +
+  geom_text(aes(label = count, angle = 90), size = 2.75, nudge_y = 2, check_overlap = TRUE) +
+  ggtitle("Autores únicos por mês\n") +
+  scale_x_date(date_breaks = "1 year", 
+               labels = date_format("%Y"),
+               expand = expand_scale(mult = c(0.01, 0.02))) +
   theme_tufte() +
   theme(axis.title = element_blank(),
         axis.text.x = element_text(angle = 60, hjust = 1))
