@@ -54,6 +54,12 @@ posts_tbl_processed %>%
   theme(axis.title = element_blank(),
         axis.text.x = element_text(angle = 0, hjust = .5))
 
+ggsave("plots/02-Authors-by-month.png",
+       width = 21,
+       height = 14.85,
+       units = "cm",
+       dpi = 300)
+
 
 # Média de posts por autor
 posts_tbl_processed %>%
