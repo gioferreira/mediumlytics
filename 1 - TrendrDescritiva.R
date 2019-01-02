@@ -67,12 +67,12 @@ posts_tbl_processed %>%
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(value, digits = 2), angle = 90), 
             size = 2.75, 
-            nudge_y = .22, 
+            nudge_y = .18, 
             check_overlap = TRUE) +
   ggtitle("Média de Posts por Autorn") +
   scale_x_date(date_breaks = "1 year", 
-               labels = date_format("%Y"))+#,
-               # expand = expand_scale(mult = c(0.01, 0.02))) +
+               labels = date_format("%Y"),
+               expand = expand_scale(mult = c(0.01, 0.02))) +
   theme_tufte() +
   theme(axis.title = element_blank(),
         axis.text.x = element_text(angle = 60, hjust = 1))
