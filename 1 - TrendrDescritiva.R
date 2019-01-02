@@ -25,7 +25,7 @@ posts_tbl_processed %>%
   ggplot(mapping = aes(x = day_published, y = n)) +
   geom_bar(stat = "identity") +
   geom_text(aes(label = n, angle = 90), size = 2.75, nudge_y = 4.5, check_overlap = TRUE) +
-  ggtitle("Total de posts por mês") +
+  ggtitle("Total de posts por mês\n") +
   scale_x_date(date_breaks = "1 year", 
                labels = date_format("%Y"),
                expand = expand_scale(mult = c(0.01, 0.02))) +
