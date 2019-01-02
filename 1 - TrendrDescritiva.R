@@ -106,6 +106,36 @@ ggsave("plots/04-word_count_hist.png",
        units = "cm",
        dpi = 300)
 
+# Idioma
+posts_tbl_processed %>%
+  group_by(detected_language) %>% 
+  tally() %>%
+  mutate(detected_language = fct_recode(detected_language,
+                                        "Português" = "pt",
+                                        "Desconhecido" = "un",
+                                        "Inglês" = "en",
+                                        "Francês" = "fr"),
+         detected_language = fct_reorder(detected_language,
+                                         n)) %>%
+  ggplot(aes(x = detected_language, y = n)) +
+  geom_col() +
+  geom_text(aes(label = n), 
+            size = 2.75, 
+            nudge_y = 20, 
+            check_overlap = TRUE,
+            hjust = 0) +
+  coord_flip() +
+  labs(title = "Idiomas dos Textos\n") +
+  theme_tufte() +
+  theme(axis.title = element_blank(),
+        axis.text.x = element_text(hjust = 0.5))
+
+ggsave("plots/05-languages.png",
+       width = 21,
+       height = 14.85,
+       units = "cm",
+       dpi = 300)
+
 # Uso de Tags: Tags Count Hist, Tag mais Frequente
 
 # Image Count hist
