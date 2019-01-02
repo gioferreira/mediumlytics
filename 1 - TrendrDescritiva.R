@@ -136,8 +136,6 @@ ggsave("plots/05-languages.png",
        units = "cm",
        dpi = 300)
 
-# Uso de Tags: Tags Count Hist, Tag mais Frequente
-
 # Image Count hist
 posts_tbl_processed %>%
   ggplot(aes(x = image_count)) +
@@ -145,10 +143,15 @@ posts_tbl_processed %>%
   scale_x_continuous(breaks = seq(0, 
                                   max(posts_tbl_processed$image_count), 
                                   by = 5)) +
-  labs(title = "Distribuição do Número de Imagens por Post",
-       subtitle = "Esse gráfico mostra que a maioria dos posts tem uma única imagem") +
+  labs(title = "Distribuição do Número de Imagens por Post\n") +
   theme_tufte() +
   theme(axis.title = element_blank())
+
+ggsave("plots/06-image_count.png",
+       width = 21,
+       height = 14.85,
+       units = "cm",
+       dpi = 300)
 
 # Links Count hist
 # Curiosamente essa segue uma Zipf Distribution
