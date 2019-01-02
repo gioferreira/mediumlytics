@@ -139,7 +139,7 @@ ggsave("plots/05-languages.png",
 # Image Count hist
 posts_tbl_processed %>%
   ggplot(aes(x = image_count)) +
-  geom_histogram(bins = max(posts_tbl_processed$image_count)) +
+  geom_histogram(binwidth = 1) +
   scale_x_continuous(breaks = seq(0, 
                                   max(posts_tbl_processed$image_count), 
                                   by = 5)) +
@@ -156,7 +156,7 @@ ggsave("plots/06-image_count.png",
 # Links Count
 posts_tbl_processed %>%
   ggplot(aes(x = links_count)) +
-  geom_histogram(bins = max(posts_tbl_processed$links_count)) +
+  geom_histogram(binwidth = 1) +
   scale_x_continuous(breaks = seq(0, 
                                   max(posts_tbl_processed$links_count), 
                                   by = 3)) +
@@ -170,22 +170,7 @@ ggsave("plots/07-links_count.png",
        units = "cm",
        dpi = 300)
 
-# Mentioned Users
-posts_tbl_processed %>%
-  ggplot(aes(x = mentioned_users_count)) +
-  geom_histogram(bins = max(posts_tbl_processed$mentioned_users_count)) +
-  scale_x_continuous(breaks = seq(0, 
-                                  max(posts_tbl_processed$mentioned_users_count), 
-                                  by = 3)) +
-  labs(title = "Distribuição do Número de Usuários Mencionados por Texto\n") +
-  theme_tufte() +
-  theme(axis.title = element_blank())
 
-ggsave("plots/07-links_count.png",
-       width = 21,
-       height = 14.85,
-       units = "cm",
-       dpi = 300)
 
 
 
