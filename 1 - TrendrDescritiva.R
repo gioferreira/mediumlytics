@@ -75,7 +75,7 @@ posts_tbl_processed %>%
                expand = expand_scale(mult = c(0.01, 0.02))) +
   theme_tufte() +
   theme(axis.title = element_blank(),
-        axis.text.x = element_text(angle = 60, hjust = 1))
+        axis.text.x = element_text(angle = 0, hjust = .5))
 
 # Uso de Tags: Tags Count Hist, Tag mais Frequente
 
