@@ -143,7 +143,7 @@ posts_tbl_processed %>%
   scale_x_continuous(breaks = seq(0, 
                                   max(posts_tbl_processed$image_count), 
                                   by = 5)) +
-  labs(title = "Distribuição do Número de Imagens por Post\n") +
+  labs(title = "Distribuição do Número de Imagens por Texto\n") +
   theme_tufte() +
   theme(axis.title = element_blank())
 
@@ -160,7 +160,24 @@ posts_tbl_processed %>%
   scale_x_continuous(breaks = seq(0, 
                                   max(posts_tbl_processed$links_count), 
                                   by = 3)) +
-  labs(title = "Distribuição do Número de Links por Post\n") +
+  labs(title = "Distribuição do Número de Links por Texto\n") +
+  theme_tufte() +
+  theme(axis.title = element_blank())
+
+ggsave("plots/07-links_count.png",
+       width = 21,
+       height = 14.85,
+       units = "cm",
+       dpi = 300)
+
+# Mentioned Users
+posts_tbl_processed %>%
+  ggplot(aes(x = mentioned_users_count)) +
+  geom_histogram(bins = max(posts_tbl_processed$mentioned_users_count)) +
+  scale_x_continuous(breaks = seq(0, 
+                                  max(posts_tbl_processed$mentioned_users_count), 
+                                  by = 3)) +
+  labs(title = "Distribuição do Número de Usuários Mencionados por Texto\n") +
   theme_tufte() +
   theme(axis.title = element_blank())
 
