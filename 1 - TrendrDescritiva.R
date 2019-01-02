@@ -52,14 +52,12 @@ posts_tbl_processed %>%
                expand = expand_scale(mult = c(0.01, 0.02))) +
   theme_tufte() +
   theme(axis.title = element_blank(),
-        axis.text.x = element_text(angle = 60, hjust = 1))
+        axis.text.x = element_text(angle = 0, hjust = .5))
 
 
 # Média de posts por autor
 posts_tbl_processed %>%
   group_by(day_published = as_date(floor_date(first_published_at, "1 month"))) %>%
-  filter(day_published > "2012-12-31",
-         day_published < "2018-07-01") %>%
   summarise(total_posts = n(),
             unique_authors = n_distinct(user_id),
             posts_per_author = total_posts / unique_authors) %>%
@@ -68,11 +66,13 @@ posts_tbl_processed %>%
   ggplot(mapping = aes(x = day_published, y = value)) +
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(value, digits = 2), angle = 90), 
-            size = 3.25, 
+            size = 2.75, 
             nudge_y = .22, 
             check_overlap = TRUE) +
-  ggtitle("Média de Posts por Autor") +
-  scale_x_date(date_breaks = "3 months", labels = date_format("%b-%Y")) +
+  ggtitle("Média de Posts por Autorn") +
+  scale_x_date(date_breaks = "1 year", 
+               labels = date_format("%Y"))+#,
+               # expand = expand_scale(mult = c(0.01, 0.02))) +
   theme_tufte() +
   theme(axis.title = element_blank(),
         axis.text.x = element_text(angle = 60, hjust = 1))
