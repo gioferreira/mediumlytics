@@ -94,69 +94,6 @@ posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20190101.rds")
 
 posts_tbl_processed %>% skim()
 
-# 1 Análise descritiva
-## Total de posts por mês
-posts_tbl_processed %>%
-  group_by(day_published = floor_date(first_published_at, "1 month")) %>%
-  tally() %>%
-  # mutate(day_published = as_date(day_published)) %>%
-  ggplot(mapping = aes(x = day_published, y = n)) +
-  geom_bar(stat = "identity") +
-  geom_text(aes(label = n, angle = 90), size = 3.25, nudge_y = 5.5, check_overlap = TRUE) +
-  ggtitle("Total de posts por mês") +
-  # scale_x_date(date_breaks = "3 months") +
-  theme_tufte() +
-  theme(axis.title = element_blank(),
-        axis.text.x = element_text(angle = 60, hjust = 1))
-
-
-## Autores únicos por mês
-posts_tbl_processed %>%
-  group_by(day_published = floor_date(first_published_at, "1 month")) %>%
-  summarise(count = n_distinct(user_id)) %>%
-  ggplot(mapping = aes(x = day_published, y = count)) +
-  geom_bar(stat = "identity") +
-  geom_text(aes(label = count, angle = 90), size = 3.25, nudge_y = 5, check_overlap = TRUE) +
-  ggtitle("Autores únicos por mês") +
-  theme_tufte() +
-  theme(axis.title = element_blank(),
-        legend.title = element_blank())
-
-## Total Posts Vs Unique Authors
-posts_tbl_processed %>%
-  group_by(day_published = floor_date(first_published_at, "1 month")) %>%
-  summarise(total_posts = n(),
-            unique_authors = n_distinct(user_id),
-            posts_per_author = total_posts / unique_authors) %>%
-  gather(key, value, -day_published) %>%
-  filter(key != "posts_per_author") %>%
-  ggplot(mapping = aes(x = day_published, y = value, fill = key)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  ggtitle("Total de Posts e Autores Únicos por Mês") +
-  theme_tufte() +
-  theme(axis.title = element_blank(),
-        legend.title = element_blank())
-
-
-# Posts per Author
-posts_tbl_processed %>%
-  group_by(day_published = floor_date(first_published_at, "1 month")) %>%
-  summarise(total_posts = n(),
-            unique_authors = n_distinct(user_id),
-            posts_per_author = total_posts / unique_authors) %>%
-  gather(key, value, -day_published) %>%
-  filter(key == "posts_per_author") %>%
-  ggplot(mapping = aes(x = day_published, y = value)) +
-  geom_bar(stat = "identity") +
-  geom_text(aes(label = round(value, digits = 2), angle = 90), 
-            size = 3.25, 
-            nudge_y = .22, 
-            check_overlap = TRUE) +
-  ggtitle("Número de Posts por Autor") +
-  theme_tufte() +
-  theme(axis.title = element_blank(),
-        legend.title = element_blank())
-
 
 ## Base de dados de Posts Totais por mês para comparar com média ou soma de recommends
 total_posts_month <- posts_tbl_processed %>%
@@ -250,7 +187,8 @@ posts_tbl_processed %>%
 normalized = (x-min(x))/(max(x)-min(x))
 
 
-########### Success Score Normal over time
+########### Success Score Normal over time 
+#### CHECAR se pmean should be pmedian
 posts_tbl_processed %>%
   group_by(day_published = floor_date(first_published_at, "1 day")) %>%
   mutate(pmean_clap_count = mean(total_clap_count),
