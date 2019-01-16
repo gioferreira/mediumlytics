@@ -191,7 +191,7 @@ ggsave("plots/08-total_clap_count.png",
 
 # Total Clap Count Hist filtered
 posts_tbl_processed %>%
-  filter(total_clap_count <= 500) %>%
+  filter(total_clap_count <= 167) %>%
   ggplot(aes(x = total_clap_count)) +
   geom_histogram(binwidth = 10) +
   scale_x_continuous(breaks = seq(0, 
