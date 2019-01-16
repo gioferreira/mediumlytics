@@ -208,7 +208,7 @@ ggsave("plots/08b-total_clap_count_filtered.png",
        units = "cm",
        dpi = 300)
 
-### total clap over time
+### total clap over time 
 start_clap <- ymd("2017-08-01")
 
 posts_tbl_processed %>%
@@ -255,12 +255,12 @@ ggsave("plots/12-recommends_full.png",
        dpi = 300)
 
 # Recommends Hist Filtered p75
-posts_tbl_processed %>%
-  filter(recommends <= 200) %>%
+posts_tbl_processed %>% 
+  filter(recommends <= 200) %>% 
   ggplot(aes(x = recommends)) +
   geom_histogram(binwidth = 5) +
-  scale_x_continuous(breaks = seq(0,
-                                  200,
+  scale_x_continuous(breaks = seq(0, 
+                                  200, 
                                   by = 5)) +
   labs(title = "Distribuição de \"Palmas Únicas\" por Post",
        subtitle = "Aqui considero o máximo de 1 palma por usuário, filtradas por recommends <= 200") +
@@ -276,12 +276,12 @@ ggsave("plots/12b-recommends_filtered.png",
 
 
 # Responses Created Count Hist
-posts_tbl_processed %>%
-  # filter(responses_created_count <= 200) %>%
+posts_tbl_processed %>% 
+  # filter(responses_created_count <= 200) %>% 
   ggplot(aes(x = responses_created_count)) +
   geom_histogram(binwidth = 5) +
-  scale_x_continuous(breaks = seq(0,
-                                  max(posts_tbl_processed$responses_created_count),
+  scale_x_continuous(breaks = seq(0, 
+                                  max(posts_tbl_processed$responses_created_count), 
                                   by = 5)) +
   labs(title = "Distribuição de Respostas por Post") +
   theme_tufte() +
@@ -295,12 +295,12 @@ ggsave("plots/13-responses_full.png",
        dpi = 300)
 
 # Responses Created Count Hist Filtered
-posts_tbl_processed %>%
+posts_tbl_processed %>% 
   filter(responses_created_count <= 25) %>%
   ggplot(aes(x = responses_created_count)) +
   geom_histogram(binwidth = 1) +
-  scale_x_continuous(breaks = seq(0,
-                                  25,
+  scale_x_continuous(breaks = seq(0, 
+                                  25, 
                                   by = 1)) +
   labs(title = "Distribuição de Respostas por Post",
        subtitle = "Filtradas por respostas <= 25") +
@@ -326,11 +326,11 @@ posts_tbl_processed %>%
   count(word, sort = TRUE) %>%
   filter(!is.na(word),
          word != "") %>%
-  with(wordcloud(word,
-                 n,
+  with(wordcloud(word, 
+                 n, 
                  scale = c(5.25, .55),
-                 random.order = FALSE,
-                 max.words = 50,
+                 random.order = FALSE, 
+                 max.words = 50, 
                  colors = (brewer.pal(10, "Greys")[5:8]),
                  rot.per = .25,
                  use.r.layout = FALSE
@@ -350,15 +350,15 @@ posts_tbl_processed %>%
   geom_col() +
   coord_flip() +
   labs(title = "Rank das 50 Tags Mais Utilizadas\n") +
-  geom_text(aes(label = n),
-            angle = 0,
+  geom_text(aes(label = n), 
+            angle = 0, 
             # position = "Left",
-            size = 2.25,
-            nudge_y = 15,
+            size = 2.25, 
+            nudge_y = 15, 
             check_overlap = TRUE) +
   theme_tufte() +
   theme(axis.title = element_blank(),
-        axis.text.x = element_text(angle = 90,
+        axis.text.x = element_text(angle = 90, 
                                    hjust = 1),
         axis.text.y = element_text(size = 7))
 
