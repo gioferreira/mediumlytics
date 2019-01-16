@@ -11,6 +11,8 @@ library(ggthemes)
 library(lubridate)
 library(scales)
 library(gghighlight)
+library(tidytext)
+library(wordcloud)
 
 
 posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20190101.rds")
