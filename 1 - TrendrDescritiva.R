@@ -236,18 +236,136 @@ ggsave("plots/11-claps_over_time.png",
 
 
 # Recommends Hist e explicação (unique clappers)
-posts_tbl_processed %>% filter(recommends <= 300) %>% #filter(word_count>500 & word_count < 1250)
+posts_tbl_processed %>% #filter(recommends <= 300) %>% #filter(word_count>500 & word_count < 1250)
   ggplot(aes(x = recommends)) +
-  geom_histogram(binwidth = 5) +
+  geom_histogram(binwidth = 50) +
   scale_x_continuous(breaks = seq(0, 
                                   max(posts_tbl_processed$recommends), 
-                                  by = 5)) +
-  labs(title = "Distribuição de Recommends por Post") +
+                                  by = 500)) +
+  labs(title = "Distribuição de \"Palmas Únicas\" por Post",
+       subtitle = "Aqui considero o máximo de 1 palma por usuário") +
   theme_tufte() +
   theme(axis.title = element_blank(),
         axis.text.x = element_text(angle = 90, hjust = 1))
 
-# Responses Created Count Hist
+ggsave("plots/12-recommends_full.png",
+       width = 21,
+       height = 14.85,
+       units = "cm",
+       dpi = 300)
 
+# Recommends Hist Filtered p75
+posts_tbl_processed %>%
+  filter(recommends <= 200) %>%
+  ggplot(aes(x = recommends)) +
+  geom_histogram(binwidth = 5) +
+  scale_x_continuous(breaks = seq(0,
+                                  200,
+                                  by = 5)) +
+  labs(title = "Distribuição de \"Palmas Únicas\" por Post",
+       subtitle = "Aqui considero o máximo de 1 palma por usuário, filtradas por recommends <= 200") +
+  theme_tufte() +
+  theme(axis.title = element_blank(),
+        axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5))
+
+ggsave("plots/12b-recommends_filtered.png",
+       width = 21,
+       height = 14.85,
+       units = "cm",
+       dpi = 300)
+
+
+# Responses Created Count Hist
+posts_tbl_processed %>%
+  # filter(responses_created_count <= 200) %>%
+  ggplot(aes(x = responses_created_count)) +
+  geom_histogram(binwidth = 5) +
+  scale_x_continuous(breaks = seq(0,
+                                  max(posts_tbl_processed$responses_created_count),
+                                  by = 5)) +
+  labs(title = "Distribuição de Respostas por Post") +
+  theme_tufte() +
+  theme(axis.title = element_blank(),
+        axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5))
+
+ggsave("plots/13-responses_full.png",
+       width = 21,
+       height = 14.85,
+       units = "cm",
+       dpi = 300)
+
+# Responses Created Count Hist Filtered
+posts_tbl_processed %>%
+  filter(responses_created_count <= 25) %>%
+  ggplot(aes(x = responses_created_count)) +
+  geom_histogram(binwidth = 1) +
+  scale_x_continuous(breaks = seq(0,
+                                  25,
+                                  by = 1)) +
+  labs(title = "Distribuição de Respostas por Post",
+       subtitle = "Filtradas por respostas <= 25") +
+  theme_tufte() +
+  theme(axis.title = element_blank(),
+        axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5))
+
+ggsave("plots/13-responses_filtered.png",
+       width = 21,
+       height = 14.85,
+       units = "cm",
+       dpi = 300)
+
+# Tags
+
+set.seed(1234)
+
+posts_tbl_processed %>%
+  select(num_range("tag_", 1:5)) %>%
+  gather() %>%
+  select(value) %>%
+  rename(word = value) %>%
+  count(word, sort = TRUE) %>%
+  filter(!is.na(word),
+         word != "") %>%
+  with(wordcloud(word,
+                 n,
+                 scale = c(5.25, .55),
+                 random.order = FALSE,
+                 max.words = 50,
+                 colors = (brewer.pal(10, "Greys")[5:8]),
+                 rot.per = .25,
+                 use.r.layout = FALSE
+                 ))
+### não sei salvar o plot do wordcloud =( usei o RStudio mesmo)
+
+posts_tbl_processed %>%
+  select(num_range("tag_", 1:5)) %>%
+  gather() %>%
+  select(value) %>%
+  rename(word = value) %>%
+  count(word, sort = TRUE) %>%
+  filter(!is.na(word),
+         word != "") %>%
+  top_n(50, wt = n) %>%
+  ggplot(aes(x = reorder(word, n, sum), y = n)) +
+  geom_col() +
+  coord_flip() +
+  labs(title = "Rank das 50 Tags Mais Utilizadas\n") +
+  geom_text(aes(label = n),
+            angle = 0,
+            # position = "Left",
+            size = 2.25,
+            nudge_y = 15,
+            check_overlap = TRUE) +
+  theme_tufte() +
+  theme(axis.title = element_blank(),
+        axis.text.x = element_text(angle = 90,
+                                   hjust = 1),
+        axis.text.y = element_text(size = 7))
+
+ggsave("plots/10-rank_tags.png",
+       width = 21,
+       height = 14.85,
+       units = "cm",
+       dpi = 300)
 
   
