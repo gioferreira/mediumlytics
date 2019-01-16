@@ -208,6 +208,32 @@ ggsave("plots/08b-total_clap_count_filtered.png",
        units = "cm",
        dpi = 300)
 
+### total clap over time
+start_clap <- ymd("2017-08-01")
+
+posts_tbl_processed %>%
+  # filter(total_clap_count <= 167) %>%
+  group_by(day_published = as_date(floor_date(first_published_at, "1 month"))) %>%
+  summarise(mean_clap_count = mean(total_clap_count),
+            sum_clap_count = sum(total_clap_count)) %>%
+  gather(key, value, -day_published) %>%
+  mutate(key = fct_recode(key,
+                           "Média de Palmas" = "mean_clap_count",
+                           "Soma das Palmas" = "sum_clap_count")) %>%
+  ggplot(aes(x = day_published, y = value, linetype = key)) +
+  geom_line(show.legend = FALSE) +
+  facet_grid(rows = vars(key), scales = "free") +
+  geom_vline(xintercept = start_clap) +
+  labs(title = "Média e Soma da Palmas Agrupadas por Mês") +
+  theme_tufte() +
+  theme(axis.title = element_blank())
+
+ggsave("plots/11-claps_over_time.png",
+       width = 21,
+       height = 14.85,
+       units = "cm",
+       dpi = 300)
+
 
 # Recommends Hist e explicação (unique clappers)
 posts_tbl_processed %>% filter(recommends <= 300) %>% #filter(word_count>500 & word_count < 1250)
