@@ -11,7 +11,7 @@ library(lubridate)
 library(scales)
 library(tidytext)
 library(wordcloud)
-library(h2o0)
+library(h2o)
 
 
 posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20190101.rds")
