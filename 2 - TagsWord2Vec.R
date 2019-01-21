@@ -53,11 +53,11 @@ tokenize <- function(sentences) {
 
 words <- h2o.na_omit(tokenize(tags$tags))
 
-w2v.model <- h2o.word2vec(words, vec_size = 300, window_size = 5, epochs = 20000)
+w2v.model <- h2o.word2vec(words, vec_size = 300, window_size = 3, epochs = 20000)
 
 model_path <- h2o.saveModel(object = w2v.model, path = "saved_data", force = TRUE)
 
-load_model_path <- "saved_data/Word2Vec_model_R_1548102206983_1"
+load_model_path <- "saved_data/Word2Vec_model_R_1548102206983_3"
 
 w2v.model <- h2o.loadModel(path = load_model_path)
 
@@ -67,7 +67,7 @@ word_embedings <- h2o.toFrame(w2v.model)
 
 tsne_model <- Rtsne(as.matrix(word_embedings[,2:101]),
                     initial_dims = 300,
-                    perplexity = 20,
+                    perplexity = 24,
                     theta = .05,
                     max_iter = 20000*2,
                     eta = 5)
