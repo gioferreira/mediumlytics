@@ -53,7 +53,7 @@ tokenize <- function(sentences) {
 
 words <- h2o.na_omit(tokenize(tags$tags))
 
-w2v.model <- h2o.word2vec(words, vec_size = 300, window_size = 3, epochs = 20000)
+w2v.model <- h2o.word2vec(words, vec_size = 300, window_size = 3, epochs = 10000)
 
 model_path <- h2o.saveModel(object = w2v.model, path = "saved_data", force = TRUE)
 
