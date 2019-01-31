@@ -1,0 +1,935 @@
+%!PS-Adobe-3.0 EPSF-3.0
+%%DocumentNeededResources: font Helvetica
+%%+ font Helvetica-Bold
+%%+ font Helvetica-Oblique
+%%+ font Helvetica-BoldOblique
+%%+ font Symbol
+%%Title: R Graphics Output
+%%Creator: R Software
+%%Pages: (atend)
+%%BoundingBox: 0 0 1440 958
+%%EndComments
+%%BeginProlog
+/bp  { gs sRGB gs } def
+% begin .ps.prolog
+/gs  { gsave } bind def
+/gr  { grestore } bind def
+/ep  { showpage gr gr } bind def
+/m   { moveto } bind def
+/l  { rlineto } bind def
+/np  { newpath } bind def
+/cp  { closepath } bind def
+/f   { fill } bind def
+/o   { stroke } bind def
+/c   { newpath 0 360 arc } bind def
+/r   { 4 2 roll moveto 1 copy 3 -1 roll exch 0 exch rlineto 0 rlineto -1 mul 0 exch rlineto closepath } bind def
+/p1  { stroke } bind def
+/p2  { gsave bg fill grestore newpath } bind def
+/p3  { gsave bg fill grestore stroke } bind def
+/p6  { gsave bg eofill grestore newpath } bind def
+/p7  { gsave bg eofill grestore stroke } bind def
+/t   { 5 -2 roll moveto gsave rotate
+       1 index stringwidth pop
+       mul neg 0 rmoveto show grestore } bind def
+/ta  { 4 -2 roll moveto gsave rotate show } bind def
+/tb  { 2 -1 roll 0 rmoveto show } bind def
+/cl  { grestore gsave newpath 3 index 3 index moveto 1 index
+       4 -1 roll lineto  exch 1 index lineto lineto
+       closepath clip newpath } bind def
+/rgb { setrgbcolor } bind def
+/s   { scalefont setfont } bind def
+% end   .ps.prolog
+/sRGB { [ /CIEBasedABC
+          << /DecodeLMN
+               [ { dup 0.03928 le
+                        {12.92321 div}
+                        {0.055 add 1.055 div 2.4 exp }
+                     ifelse
+                 } bind dup dup
+               ]
+             /MatrixLMN [0.412457 0.212673 0.019334
+                         0.357576 0.715152 0.119192
+                         0.180437 0.072175 0.950301]
+             /WhitePoint [0.9505 1.0 1.0890]
+           >>
+         ] setcolorspace } bind def
+/srgb { setcolor } bind def
+%%IncludeResource: font Helvetica
+/Helvetica findfont
+dup length dict begin
+  {1 index /FID ne {def} {pop pop} ifelse} forall
+  /Encoding ISOLatin1Encoding def
+  currentdict
+  end
+/Font1 exch definefont pop
+%%IncludeResource: font Helvetica-Bold
+/Helvetica-Bold findfont
+dup length dict begin
+  {1 index /FID ne {def} {pop pop} ifelse} forall
+  /Encoding ISOLatin1Encoding def
+  currentdict
+  end
+/Font2 exch definefont pop
+%%IncludeResource: font Helvetica-Oblique
+/Helvetica-Oblique findfont
+dup length dict begin
+  {1 index /FID ne {def} {pop pop} ifelse} forall
+  /Encoding ISOLatin1Encoding def
+  currentdict
+  end
+/Font3 exch definefont pop
+%%IncludeResource: font Helvetica-BoldOblique
+/Helvetica-BoldOblique findfont
+dup length dict begin
+  {1 index /FID ne {def} {pop pop} ifelse} forall
+  /Encoding ISOLatin1Encoding def
+  currentdict
+  end
+/Font4 exch definefont pop
+%%IncludeResource: font Symbol
+/Symbol findfont
+dup length dict begin
+  {1 index /FID ne {def} {pop pop} ifelse} forall
+  currentdict
+  end
+/Font5 exch definefont pop
+%%EndProlog
+%%Page: 1 1
+bp
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+8.22 8.22 1434.52 953.02 cl
+/bg { 0 0 0 srgb } def
+0 0 0 srgb
+1.07 setlinewidth
+[] 0 setdash
+1 setlinecap
+1 setlinejoin
+10.00 setmiterlimit
+8.22 8.22 1426.30 944.80 r p3
+/Font2 findfont 9 s
+0.6275 0.9098 0.3569 srgb
+157.02 562.48 (design-thinking) .5 0 t
+0.8431 0.1451 0.6392 srgb
+1058.41 663.15 (cinema-brasileir) 0 ta
+-0.180 (o) tb gr
+0.2118 0.8980 0.0824 srgb
+1182.76 320.99 (nossa-g) 0 ta
+0.090 (ente) tb gr
+0.4980 0.1294 0.3412 srgb
+966.74 532.16 (sonhos) .5 0 t
+0.4941 0.9098 0.7529 srgb
+896.32 219.34 (horr) 0 ta
+-0.180 (or) tb gr
+0.2118 0.8980 0.0824 srgb
+945.80 349.99 (twitter) .5 0 t
+0.9961 0.1137 0.4000 srgb
+189.68 367.23 (culture) .5 0 t
+0.3608 0.5725 0.1843 srgb
+411.64 440.38 (motiv) 0 ta
+-0.180 (ational) tb gr
+0.4706 0.2078 0.8275 srgb
+580.60 724.54 (relato) .5 0 t
+0.9137 0.8431 0.2157 srgb
+310.60 447.28 (ne) 0 ta
+-0.135 (w-or) tb
+-0.180 (der) tb gr
+0.4980 0.1294 0.3412 srgb
+1030.73 594.84 (lideranca) .5 0 t
+0.4706 0.2078 0.8275 srgb
+394.53 751.53 (cristianismo) .5 0 t
+0.1098 0.2941 0.7059 srgb
+1247.65 601.09 (urbanismo) .5 0 t
+0.9529 0.5804 0.3137 srgb
+856.56 517.82 (pobreza) .5 0 t
+0.6275 0.9098 0.3569 srgb
+305.57 644.97 (intelig) 0 ta
+0.090 (encia-ar) tb
+0.180 (tificial) tb gr
+0.2118 0.8980 0.0824 srgb
+1236.82 417.45 (natal) .5 0 t
+0.0824 0.3059 0.3373 srgb
+791.17 609.50 (na-escuta) .5 0 t
+0.9961 0.1137 0.4000 srgb
+561.28 227.34 (minimalismo) .5 0 t
+0.2118 0.8980 0.0824 srgb
+1100.82 405.90 (corrupção) .5 0 t
+0.4980 0.1294 0.3412 srgb
+1072.57 501.84 (golpe) .5 0 t
+0.9961 0.1137 0.4000 srgb
+363.68 375.19 (meditação) .5 0 t
+0.9137 0.8431 0.2157 srgb
+240.69 502.99 (humor) .5 0 t
+0.8941 0.8000 0.9451 srgb
+447.77 517.34 (videos) .5 0 t
+0.3608 0.5725 0.1843 srgb
+476.35 374.23 (terapia) .5 0 t
+0.6275 0.9098 0.3569 srgb
+441.21 610.17 (g) 0 ta
+0.090 (eracao-y) tb gr
+0.4706 0.2078 0.8275 srgb
+495.21 679.01 (saopaulo) .5 0 t
+0.8431 0.1451 0.6392 srgb
+980.83 732.37 (ref) 0 ta
+-0.180 (orma-trabalhista) tb gr
+0.0824 0.3059 0.3373 srgb
+766.77 701.36 (videogames) .5 0 t
+0.4627 0.2824 0.0510 srgb
+808.88 337.25 (costume) .5 0 t
+0.2118 0.8980 0.0824 srgb
+1138.85 416.90 (consciencia) .5 0 t
+974.16 398.52 (eleições2016) .5 0 t
+0.0824 0.3059 0.3373 srgb
+790.76 689.51 (comics) .5 0 t
+0.4627 0.2824 0.0510 srgb
+617.32 393.96 (lo) 0 ta
+-0.180 (ve) tb gr
+0.4980 0.1294 0.3412 srgb
+950.35 537.38 (pr) 0 ta
+-0.180 (ojetos) tb gr
+887.20 558.38 (pessoas) .5 0 t
+0.2118 0.8980 0.0824 srgb
+1097.82 377.15 (ensino) .5 0 t
+0.4980 0.1294 0.3412 srgb
+981.18 497.14 (pr) 0 ta
+-0.180 (otestos) tb gr
+0.8941 0.8000 0.9451 srgb
+629.59 659.98 (m) 0 ta
+-0.180 (undo) tb gr
+0.2824 0.7137 0.9176 srgb
+892.75 803.10 (adoteasimesma) .5 0 t
+0.0824 0.3059 0.3373 srgb
+883.39 693.16 (masculinidade) .5 0 t
+0.9137 0.8431 0.2157 srgb
+338.93 500.69 (hbo) .5 0 t
+0.4706 0.2078 0.8275 srgb
+511.72 772.28 (smar) 0 ta
+0.180 (tphones) tb gr
+0.9137 0.8431 0.2157 srgb
+276.98 466.67 (cerebr) 0 ta
+-0.180 (o) tb gr
+0.0824 0.3059 0.3373 srgb
+776.16 668.95 (influencer) 0 ta
+-0.135 (s) tb gr
+0.8941 0.8000 0.9451 srgb
+434.71 487.74 (escrita-criativ) 0 ta
+-0.180 (a) tb gr
+0.4941 0.9098 0.7529 srgb
+782.13 271.95 (2017) .5 0 t
+0.6275 0.9098 0.3569 srgb
+88.05 589.81 (priv) 0 ta
+-0.180 (acidade) tb gr
+0.0824 0.3059 0.3373 srgb
+893.28 630.54 (constituição-brasileira) .5 0 t
+0.4941 0.9098 0.7529 srgb
+655.58 285.95 (família) .5 0 t
+0.8431 0.1451 0.6392 srgb
+1138.53 678.45 (refle) 0 ta
+-0.135 (xão) tb gr
+872.39 719.61 (terr) 0 ta
+-0.180 (or) tb gr
+0.6824 0.1882 0.1569 srgb
+241.26 739.36 (os-dez-mandamentos) .5 0 t
+0.9529 0.5804 0.3137 srgb
+898.90 438.23 (demografia) .5 0 t
+0.6275 0.9098 0.3569 srgb
+374.86 669.16 (ar) 0 ta
+0.180 (t) tb gr
+0.9137 0.8431 0.2157 srgb
+387.23 514.25 (guerra) .5 0 t
+0.9529 0.5804 0.3137 srgb
+906.47 398.93 (enem) .5 0 t
+0.6275 0.9098 0.3569 srgb
+387.10 581.86 (freelancing) .5 0 t
+0.0824 0.3059 0.3373 srgb
+700.92 669.25 (disne) 0 ta
+-0.135 (y) tb gr
+0.4627 0.2824 0.0510 srgb
+760.91 408.90 (univer) 0 ta
+-0.135 (sidade) tb gr
+0.6275 0.9098 0.3569 srgb
+253.57 685.15 (data-visualization) .5 0 t
+0.8941 0.8000 0.9451 srgb
+587.12 590.98 (apple) .5 0 t
+0.4980 0.1294 0.3412 srgb
+1051.38 558.21 (capitalismo) .5 0 t
+0.1098 0.2941 0.7059 srgb
+1227.32 523.65 (de) 0 ta
+-0.135 (v) tb
+-0.180 (aneios) tb gr
+0.4941 0.9098 0.7529 srgb
+622.97 263.70 (ar) 0 ta
+0.180 (tigos) tb gr
+0.9961 0.1137 0.4000 srgb
+428.09 262.67 (direito) .5 0 t
+0.4627 0.2824 0.0510 srgb
+575.48 349.74 (filhos) .5 0 t
+0.8431 0.1451 0.6392 srgb
+891.12 733.90 (carna) 0 ta
+-0.135 (v) tb
+-0.180 (al) tb gr
+0.0824 0.3059 0.3373 srgb
+740.20 616.70 (te) 0 ta
+-0.135 (xtao) tb gr
+0.6275 0.9098 0.3569 srgb
+116.87 541.67 (tendencias) .5 0 t
+0.8431 0.1451 0.6392 srgb
+1036.10 745.76 (abor) 0 ta
+0.180 (to) tb gr
+0.4706 0.2078 0.8275 srgb
+451.37 698.39 (lingua-por) 0 ta
+0.180 (tuguesa) tb gr
+0.6275 0.9098 0.3569 srgb
+249.14 672.37 (vr) .5 0 t
+0.2118 0.8980 0.0824 srgb
+1022.20 261.21 (fact-c) 0 ta
+-0.090 (hec) tb
+-0.180 (king) tb gr
+0.9961 0.1137 0.4000 srgb
+299.29 356.59 (r) 0 ta
+-0.180 (otina) tb gr
+495.89 265.45 (saudade) .5 0 t
+0.9529 0.5804 0.3137 srgb
+971.04 461.51 (dilma-r) 0 ta
+-0.180 (ousseff) tb gr
+0.2118 0.8980 0.0824 srgb
+1035.03 309.76 (education) .5 0 t
+0.4980 0.1294 0.3412 srgb
+916.24 599.71 (journalism) .5 0 t
+0.4627 0.2824 0.0510 srgb
+712.93 331.31 (amigos) .5 0 t
+608.54 368.01 (humanidade) .5 0 t
+0.9961 0.1137 0.4000 srgb
+232.08 278.15 (suicídio) .5 0 t
+0.2824 0.7137 0.9176 srgb
+773.57 854.29 (fashion) .5 0 t
+0.8941 0.8000 0.9451 srgb
+574.20 603.22 (maternidade) .5 0 t
+0.9529 0.5804 0.3137 srgb
+841.81 426.38 (ideologia) .5 0 t
+0.4706 0.2078 0.8275 srgb
+592.76 789.07 (pokemon) .5 0 t
+0.4980 0.1294 0.3412 srgb
+1156.53 513.91 (lula) .5 0 t
+0.4941 0.9098 0.7529 srgb
+801.66 310.36 (privilegio) .5 0 t
+0.3608 0.5725 0.1843 srgb
+486.45 411.55 (hábitos) .5 0 t
+0.2824 0.7137 0.9176 srgb
+872.98 819.06 (se) 0 ta
+-0.135 (xismo) tb gr
+0.4706 0.2078 0.8275 srgb
+634.57 779.90 (eleicoes) .5 0 t
+0.8941 0.8000 0.9451 srgb
+528.21 658.80 (google) .5 0 t
+0.9137 0.8431 0.2157 srgb
+432.13 466.76 (desigualdade-social) .5 0 t
+0.4706 0.2078 0.8275 srgb
+579.52 774.11 (cultura-do-estupr) 0 ta
+-0.180 (o) tb gr
+0.6275 0.9098 0.3569 srgb
+290.77 659.11 (realidade-vir) 0 ta
+0.180 (tual) tb gr
+0.9137 0.8431 0.2157 srgb
+388.67 500.73 (ino) 0 ta
+-0.180 (v) tb
+-0.180 (acao) tb gr
+298.87 449.37 (medicina) .5 0 t
+0.4706 0.2078 0.8275 srgb
+453.81 747.13 (branding) .5 0 t
+0.8431 0.1451 0.6392 srgb
+1029.00 713.92 (entre) 0 ta
+-0.135 (vista) tb gr
+0.2118 0.8980 0.0824 srgb
+925.97 366.35 (c) 0 ta
+-0.090 (hapecoense) tb gr
+0.4706 0.2078 0.8275 srgb
+579.19 707.23 (m) 0 ta
+-0.180 (usic) tb gr
+0.6275 0.9098 0.3569 srgb
+270.71 614.96 (escola) .5 0 t
+0.2824 0.7137 0.9176 srgb
+757.74 781.51 (digital-marketing) .5 0 t
+0.6275 0.9098 0.3569 srgb
+299.59 620.52 (mobilidade-urbana) .5 0 t
+0.0824 0.3059 0.3373 srgb
+761.98 734.35 (mpb) .5 0 t
+0.1098 0.2941 0.7059 srgb
+1179.70 626.10 (diver) 0 ta
+-0.135 (sidade) tb gr
+0.9922 0.5725 0.9804 srgb
+699.63 500.36 (pop-culture) .5 0 t
+0.0824 0.3059 0.3373 srgb
+867.68 661.59 (identidade) .5 0 t
+0.2118 0.8980 0.0824 srgb
+981.50 411.20 (fim-de-ano) .5 0 t
+0.8941 0.8000 0.9451 srgb
+551.24 656.11 (oscar-2017) .5 0 t
+0.4627 0.2824 0.0510 srgb
+576.63 285.72 (millennials) .5 0 t
+0.2118 0.8980 0.0824 srgb
+1073.24 456.55 (seguranca-pub) 0 ta
+-0.090 (lica) tb gr
+0.9137 0.8431 0.2157 srgb
+268.41 554.43 (inspiração) .5 0 t
+0.9961 0.1137 0.4000 srgb
+350.33 376.67 (psyc) 0 ta
+-0.090 (hology) tb gr
+0.4706 0.2078 0.8275 srgb
+455.53 757.57 (mer) 0 ta
+-0.180 (cado) tb gr
+0.4627 0.2824 0.0510 srgb
+594.21 345.61 (relacionamentos-ab) 0 ta
+-0.180 (usiv) tb
+-0.270 (os) tb gr
+0.6275 0.9098 0.3569 srgb
+409.24 601.61 (rap) .5 0 t
+0.4627 0.2824 0.0510 srgb
+525.78 392.95 (medo) .5 0 t
+0.0667 0.3216 0.0196 srgb
+51.60 435.13 (astr) 0 ta
+-0.180 (onom) tb
+-0.270 (y) tb gr
+0.2118 0.8980 0.0824 srgb
+1032.40 353.69 (críticas) .5 0 t
+0.4980 0.1294 0.3412 srgb
+915.95 564.29 (homof) 0 ta
+-0.180 (obia) tb gr
+0.9961 0.1137 0.4000 srgb
+463.18 266.91 (violência) .5 0 t
+0.4627 0.2824 0.0510 srgb
+805.03 346.67 (ver) 0 ta
+-0.135 (so-da-pr) tb
+-0.180 (osa) tb gr
+764.70 376.92 (leitura) .5 0 t
+624.35 428.02 (poesia) .5 0 t
+0.9961 0.1137 0.4000 srgb
+339.33 324.95 (empatia) .5 0 t
+0.9137 0.8431 0.2157 srgb
+376.83 537.16 (star-war) 0 ta
+-0.135 (s) tb gr
+0.4627 0.2824 0.0510 srgb
+760.29 347.77 (ref) 0 ta
+-0.180 (orma-da-pre) tb
+-0.135 (vidência) tb gr
+734.44 418.96 (estados-unidos) .5 0 t
+0.6275 0.9098 0.3569 srgb
+156.46 650.92 (estupr) 0 ta
+-0.180 (o) tb gr
+0.4941 0.9098 0.7529 srgb
+668.23 218.75 (psicología) .5 0 t
+0.3608 0.5725 0.1843 srgb
+551.33 484.17 (vida-simples) .5 0 t
+0.9961 0.1137 0.4000 srgb
+347.16 333.67 (lingua) 0 ta
+-0.090 (g) tb
+0.090 (em) tb gr
+0.9137 0.8431 0.2157 srgb
+340.48 533.75 (r) 0 ta
+-0.180 (oc) tb
+-0.180 (k) tb gr
+247.99 538.94 (mer) 0 ta
+-0.180 (cado-de-trabalho) tb gr
+0.3608 0.5725 0.1843 srgb
+545.29 439.84 (se) 0 ta
+-0.135 (xo) tb gr
+0.9529 0.5804 0.3137 srgb
+791.36 438.55 (te) 0 ta
+-0.135 (xtos) tb gr
+0.0824 0.3059 0.3373 srgb
+641.53 700.25 (whatsapp) .5 0 t
+0.8431 0.1451 0.6392 srgb
+951.01 615.05 (religião) .5 0 t
+0.6275 0.9098 0.3569 srgb
+156.11 643.52 (designer) .5 0 t
+0.2118 0.8980 0.0824 srgb
+901.59 365.79 (opinião) .5 0 t
+0.8431 0.1451 0.6392 srgb
+941.02 607.78 (com) 0 ta
+-0.180 (unicacao) tb gr
+0.4941 0.9098 0.7529 srgb
+937.92 265.36 (ficção-científica) .5 0 t
+0.0667 0.3216 0.0196 srgb
+68.56 443.46 (resear) 0 ta
+-0.180 (c) tb
+-0.090 (h) tb gr
+0.4627 0.2824 0.0510 srgb
+596.24 314.43 (motiv) 0 ta
+-0.180 (acional) tb gr
+0.4941 0.9098 0.7529 srgb
+686.53 242.32 (negr) 0 ta
+-0.180 (os) tb gr
+0.8431 0.1451 0.6392 srgb
+1048.73 653.31 (ponto-z) 0 ta
+0.090 (er) tb
+-0.180 (o) tb gr
+0.8941 0.8000 0.9451 srgb
+516.20 663.88 (m) 0 ta
+-0.180 (ulheres-que-escre) tb
+-0.135 (vem) tb gr
+0.6275 0.9098 0.3569 srgb
+48.80 534.21 (astr) 0 ta
+-0.180 (onomia) tb gr
+0.0824 0.3059 0.3373 srgb
+750.54 641.01 (media) .5 0 t
+776.45 609.06 (com) 0 ta
+-0.180 (unicação) tb gr
+0.2824 0.7137 0.9176 srgb
+750.87 824.37 (moda) .5 0 t
+0.3843 0.5529 0.9490 srgb
+817.83 47.93 (hiv) .5 0 t
+0.8941 0.8000 0.9451 srgb
+590.97 630.64 (cultura-popular) .5 0 t
+0.3608 0.5725 0.1843 srgb
+413.25 423.61 (amor-pr) 0 ta
+-0.180 (oprio) tb gr
+0.9529 0.5804 0.3137 srgb
+887.11 435.88 (la) 0 ta
+-0.135 (v) tb
+-0.180 (a-jato) tb gr
+0.4627 0.2824 0.0510 srgb
+578.33 386.54 (psicanalise) .5 0 t
+0.4980 0.1294 0.3412 srgb
+1147.22 508.60 (segurança) .5 0 t
+0.9137 0.8431 0.2157 srgb
+469.22 470.91 (casamento) .5 0 t
+0.3608 0.5725 0.1843 srgb
+492.64 464.83 (m) 0 ta
+-0.180 (udanca) tb gr
+0.3843 0.5529 0.9490 srgb
+806.38 54.05 (aids) .5 0 t
+0.0667 0.3216 0.0196 srgb
+115.47 429.16 (space) .5 0 t
+0.1098 0.2941 0.7059 srgb
+1251.74 589.30 (rio2016) .5 0 t
+0.9529 0.5804 0.3137 srgb
+724.49 459.65 (espor) 0 ta
+0.180 (te) tb gr
+0.4627 0.2824 0.0510 srgb
+711.57 354.87 (pais-e-filhos) .5 0 t
+709.49 404.70 (amizade) .5 0 t
+0.4980 0.1294 0.3412 srgb
+861.57 540.01 (ga) 0 ta
+-0.180 (y) tb gr
+0.4941 0.9098 0.7529 srgb
+917.15 269.17 (scifi) .5 0 t
+0.9961 0.1137 0.4000 srgb
+214.28 363.25 (ciência) .5 0 t
+0.9137 0.8431 0.2157 srgb
+409.86 481.72 (digital) .5 0 t
+0.8941 0.8000 0.9451 srgb
+510.14 560.10 (qualidade-de-vida) .5 0 t
+0.8431 0.1451 0.6392 srgb
+1107.65 686.83 (critica) .5 0 t
+953.87 685.03 (g) 0 ta
+0.090 (êner) tb
+-0.180 (o) tb gr
+0.8941 0.8000 0.9451 srgb
+477.93 591.01 (pr) 0 ta
+-0.180 (odutividade) tb gr
+588.71 573.25 (tv) .5 0 t
+653.04 645.92 (midia) .5 0 t
+600.30 658.74 (star) 0 ta
+0.180 (tup) tb gr
+0.8431 0.1451 0.6392 srgb
+958.16 603.34 (b) 0 ta
+-0.180 (udismo) tb gr
+0.9922 0.5725 0.9804 srgb
+607.48 528.54 (f) 0 ta
+-0.090 (elicidade-líquida) tb gr
+0.4980 0.1294 0.3412 srgb
+974.87 501.33 (politics) .5 0 t
+0.9529 0.5804 0.3137 srgb
+825.64 496.47 (uber) .5 0 t
+0.3843 0.5529 0.9490 srgb
+772.72 53.00 (precisamosfalar) 0 ta
+-0.135 (sobrehiv) tb gr
+0.6275 0.9098 0.3569 srgb
+455.97 641.35 (por) 0 ta
+0.180 (tugal) tb gr
+0.8588 0.7725 0.5569 srgb
+764.75 549.82 (direitos-humanos) .5 0 t
+0.9961 0.1137 0.4000 srgb
+428.20 322.17 (turismo) .5 0 t
+0.4706 0.2078 0.8275 srgb
+415.58 707.86 (mar) 0 ta
+0.090 (vel) tb gr
+0.9137 0.8431 0.2157 srgb
+306.48 504.89 (são-paulo) .5 0 t
+0.8941 0.8000 0.9451 srgb
+514.71 543.36 (m) 0 ta
+-0.180 (ulheres) tb gr
+0.0824 0.3059 0.3373 srgb
+718.60 680.73 (oscar) 0 ta
+-0.135 (s) tb gr
+0.9137 0.8431 0.2157 srgb
+393.67 551.32 (via) 0 ta
+-0.090 (g) tb
+0.090 (em) tb gr
+0.4941 0.9098 0.7529 srgb
+777.29 250.37 (pensamento) .5 0 t
+0.6824 0.1882 0.1569 srgb
+225.59 792.00 (rede-globo) .5 0 t
+0.9137 0.8431 0.2157 srgb
+232.64 556.68 (graphic-design) .5 0 t
+0.4627 0.2824 0.0510 srgb
+659.17 413.07 (educacao) .5 0 t
+0.4980 0.1294 0.3412 srgb
+790.04 590.89 (derrube-m) 0 ta
+-0.180 (ur) tb
+-0.180 (os) tb gr
+0.9529 0.5804 0.3137 srgb
+952.14 469.26 (eleições-2018) .5 0 t
+0.4980 0.1294 0.3412 srgb
+1020.37 525.98 (globo) .5 0 t
+0.1098 0.2941 0.7059 srgb
+1187.00 544.08 (crise) .5 0 t
+0.0667 0.3216 0.0196 srgb
+126.45 438.27 (pesquisa) .5 0 t
+0.4627 0.2824 0.0510 srgb
+764.28 398.27 (liber) 0 ta
+-0.180 (dade) tb gr
+0.8588 0.7725 0.5569 srgb
+687.91 592.54 (y) 0 ta
+-0.225 (outube) tb gr
+0.9529 0.5804 0.3137 srgb
+769.33 463.79 (justiça) .5 0 t
+0.8588 0.7725 0.5569 srgb
+745.39 552.44 (go) 0 ta
+-0.180 (verno) tb gr
+0.4627 0.2824 0.0510 srgb
+818.90 401.34 (ficção) .5 0 t
+627.43 393.53 (b) 0 ta
+-0.090 (lac) tb
+-0.180 (klivesmatter) tb gr
+581.98 355.76 (familia) .5 0 t
+0.6824 0.1882 0.1569 srgb
+496.99 906.84 (leiatrendr) .5 0 t
+0.9529 0.5804 0.3137 srgb
+727.79 452.64 (aprendizado) .5 0 t
+0.3608 0.5725 0.1843 srgb
+512.21 417.12 (autoestima) .5 0 t
+0.9961 0.1137 0.4000 srgb
+363.92 270.51 (insta) 0 ta
+-0.090 (gram) tb gr
+0.3608 0.5725 0.1843 srgb
+561.36 459.96 (cr) 0 ta
+-0.180 (onicas) tb gr
+0.4627 0.2824 0.0510 srgb
+708.18 424.84 (futur) 0 ta
+-0.180 (o) tb gr
+0.2118 0.8980 0.0824 srgb
+1369.69 436.66 (tirinha) .5 0 t
+0.9137 0.8431 0.2157 srgb
+455.00 533.67 (religiao) .5 0 t
+0.8431 0.1451 0.6392 srgb
+977.15 636.28 (lif) 0 ta
+-0.090 (e) tb gr
+0.9922 0.5725 0.9804 srgb
+620.47 486.29 (mor) 0 ta
+0.180 (te) tb gr
+0.4980 0.1294 0.3412 srgb
+932.60 536.52 (series) .5 0 t
+0.6824 0.1882 0.1569 srgb
+433.20 897.39 (re) 0 ta
+-0.135 (vistatrendr) tb gr
+0.2118 0.8980 0.0824 srgb
+1067.52 453.59 (bolsonar) 0 ta
+-0.180 (o) tb gr
+0.4706 0.2078 0.8275 srgb
+628.45 763.77 (games) .5 0 t
+0.8941 0.8000 0.9451 srgb
+544.19 532.09 (história) .5 0 t
+0.6275 0.9098 0.3569 srgb
+303.94 671.14 (tec) 0 ta
+-0.090 (h) tb gr
+0.4627 0.2824 0.0510 srgb
+607.01 404.72 (tempo) .5 0 t
+0.9529 0.5804 0.3137 srgb
+896.41 484.14 (impeac) 0 ta
+-0.090 (hment) tb gr
+0.1098 0.2941 0.7059 srgb
+1242.61 596.65 (olimpiadas) .5 0 t
+0.9961 0.1137 0.4000 srgb
+248.36 289.79 (ansiedade) .5 0 t
+0.4980 0.1294 0.3412 srgb
+854.98 537.40 (viv) 0 ta
+-0.180 (a-a-dif) tb
+-0.090 (erença) tb gr
+0.3608 0.5725 0.1843 srgb
+377.14 417.35 (saúde) .5 0 t
+0.8941 0.8000 0.9451 srgb
+559.29 596.59 (b) 0 ta
+-0.180 (usiness) tb gr
+0.9529 0.5804 0.3137 srgb
+884.62 450.13 (donald-trump) .5 0 t
+0.9137 0.8431 0.2157 srgb
+501.60 470.97 (sentimentos) .5 0 t
+0.9922 0.5725 0.9804 srgb
+595.62 546.79 (tlab) .5 0 t
+0.8588 0.7725 0.5569 srgb
+772.75 596.43 (espiritualidade) .5 0 t
+0.0824 0.3059 0.3373 srgb
+870.86 654.47 (se) 0 ta
+-0.135 (xualidade) tb gr
+0.8941 0.8000 0.9451 srgb
+499.60 560.97 (negocios) .5 0 t
+0.0667 0.3216 0.0196 srgb
+127.83 400.62 (nasa) .5 0 t
+0.9922 0.5725 0.9804 srgb
+620.62 543.63 (medium) .5 0 t
+693.00 496.40 (planejamento) .5 0 t
+0.9961 0.1137 0.4000 srgb
+594.89 225.53 (sustentabilidade) .5 0 t
+0.9529 0.5804 0.3137 srgb
+784.24 494.25 (historia) .5 0 t
+0.8588 0.7725 0.5569 srgb
+842.98 565.84 (txt) .5 0 t
+0.3608 0.5725 0.1843 srgb
+417.08 408.90 (nossa-f) 0 ta
+-0.090 (elicidade) tb gr
+0.6824 0.1882 0.1569 srgb
+261.40 791.04 (no) 0 ta
+-0.180 (vela) tb gr
+0.3608 0.5725 0.1843 srgb
+396.56 394.26 (saúde-mental) .5 0 t
+0.9529 0.5804 0.3137 srgb
+914.96 476.29 (mic) 0 ta
+-0.090 (hel-temer) tb gr
+0.4627 0.2824 0.0510 srgb
+725.16 417.10 (resenha) .5 0 t
+0.9529 0.5804 0.3137 srgb
+841.84 457.48 (violencia) .5 0 t
+0.6275 0.9098 0.3569 srgb
+250.18 660.98 (f) 0 ta
+-0.180 (otografia) tb gr
+0.2118 0.8980 0.0824 srgb
+1004.67 273.31 (fake-ne) 0 ta
+-0.135 (ws) tb gr
+0.4627 0.2824 0.0510 srgb
+548.52 325.42 (refle) 0 ta
+-0.135 (xao) tb gr
+0.3608 0.5725 0.1843 srgb
+552.09 450.93 (depressão) .5 0 t
+519.18 479.07 (breaking-ne) 0 ta
+-0.135 (ws) tb gr
+0.0824 0.3059 0.3373 srgb
+678.58 649.72 (enter) 0 ta
+0.180 (tainment) tb gr
+0.4941 0.9098 0.7529 srgb
+863.02 257.02 (literatura-fantastica) .5 0 t
+0.0824 0.3059 0.3373 srgb
+679.03 684.60 (marketing) .5 0 t
+0.9529 0.5804 0.3137 srgb
+908.61 481.52 (democracia) .5 0 t
+0.9922 0.5725 0.9804 srgb
+674.60 535.11 (futebol) .5 0 t
+676.49 482.78 (m) 0 ta
+-0.180 (úsica) tb gr
+0.2118 0.8980 0.0824 srgb
+1358.10 443.55 (ilustre) .5 0 t
+1335.47 432.26 (quadrinhos) .5 0 t
+0.0824 0.3059 0.3373 srgb
+732.30 609.59 (pub) 0 ta
+-0.090 (licidade) tb gr
+0.8941 0.8000 0.9451 srgb
+533.77 567.75 (documentar) 0 ta
+0.090 (y) tb gr
+0.8588 0.7725 0.5569 srgb
+702.36 580.14 (film) .5 0 t
+0.2824 0.7137 0.9176 srgb
+863.11 771.58 (mac) 0 ta
+-0.090 (hismo) tb gr
+0.9922 0.5725 0.9804 srgb
+717.29 478.78 (filosofia) .5 0 t
+0.2118 0.8980 0.0824 srgb
+1156.94 356.91 (trendr) .5 0 t
+0.8941 0.8000 0.9451 srgb
+508.28 560.44 (papo-aber) 0 ta
+0.180 (to) tb gr
+0.8588 0.7725 0.5569 srgb
+686.46 585.72 (eden-wiedemann) .5 0 t
+0.8941 0.8000 0.9451 srgb
+631.06 567.31 (empreendedorismo) .5 0 t
+0.9529 0.5804 0.3137 srgb
+819.18 514.79 (preconceito) .5 0 t
+0.9137 0.8431 0.2157 srgb
+321.33 566.06 (ctrl) .5 0 t
+0.0667 0.3216 0.0196 srgb
+139.34 414.48 (science) .5 0 t
+0.6824 0.1882 0.1569 srgb
+229.95 792.21 (tele) 0 ta
+-0.135 (visão) tb gr
+0.9922 0.5725 0.9804 srgb
+628.35 539.27 (netflix) .5 0 t
+0.8941 0.8000 0.9451 srgb
+487.44 502.85 (tv-series) .5 0 t
+0.9529 0.5804 0.3137 srgb
+957.28 466.13 (eleições) .5 0 t
+0.1098 0.2941 0.7059 srgb
+1134.44 561.53 (rio-de-janeir) 0 ta
+-0.180 (o) tb gr
+0.9922 0.5725 0.9804 srgb
+666.82 514.44 (entretenimento) .5 0 t
+0.2824 0.7137 0.9176 srgb
+853.27 765.09 (m) 0 ta
+-0.180 (ulher) tb gr
+0.3608 0.5725 0.1843 srgb
+586.66 487.62 (autoconhecimento) .5 0 t
+0.9529 0.5804 0.3137 srgb
+747.05 483.00 (trabalho) .5 0 t
+0.9922 0.5725 0.9804 srgb
+685.90 465.00 (racismo) .5 0 t
+660.90 540.92 (criatividade) .5 0 t
+0.8941 0.8000 0.9451 srgb
+536.95 582.33 (ino) 0 ta
+-0.180 (v) tb
+-0.180 (ação) tb gr
+0.8588 0.7725 0.5569 srgb
+771.81 573.36 (facebook) .5 0 t
+0.9529 0.5804 0.3137 srgb
+787.90 463.66 (economia) .5 0 t
+0.3608 0.5725 0.1843 srgb
+512.52 458.94 (f) 0 ta
+-0.090 (elicidade) tb gr
+0.9922 0.5725 0.9804 srgb
+683.76 517.22 (carreira) .5 0 t
+750.84 489.79 (escrita) .5 0 t
+605.16 525.32 (letter) 0 ta
+-0.135 (s) tb gr
+0.9137 0.8431 0.2157 srgb
+219.87 425.94 (ciencia) .5 0 t
+0.9922 0.5725 0.9804 srgb
+582.75 501.68 (m) 0 ta
+-0.180 (usica) tb gr
+0.9529 0.5804 0.3137 srgb
+752.36 431.49 (livr) 0 ta
+-0.180 (os) tb gr
+0.9922 0.5725 0.9804 srgb
+594.23 483.84 (psicologia) .5 0 t
+0.8588 0.7725 0.5569 srgb
+792.56 564.77 (lgbtq) .5 0 t
+0.9922 0.5725 0.9804 srgb
+700.85 492.29 (contos) .5 0 t
+0.4980 0.1294 0.3412 srgb
+884.72 571.25 (brazil) .5 0 t
+0.9922 0.5725 0.9804 srgb
+684.23 531.79 (7min) .5 0 t
+0.8588 0.7725 0.5569 srgb
+694.43 594.09 (mo) 0 ta
+-0.180 (vies) tb gr
+0.9922 0.5725 0.9804 srgb
+556.25 497.82 (medium-em-por) 0 ta
+0.180 (tuguês) tb gr
+0.6275 0.9098 0.3569 srgb
+385.09 638.57 (rapidinhas) .5 0 t
+0.9529 0.5804 0.3137 srgb
+775.00 493.76 (jornalismo) .5 0 t
+0.8588 0.7725 0.5569 srgb
+717.63 554.46 (social-media) .5 0 t
+0.9922 0.5725 0.9804 srgb
+713.22 484.91 (educação) .5 0 t
+0.6275 0.9098 0.3569 srgb
+439.04 604.64 (tecnologia) .5 0 t
+0.9529 0.5804 0.3137 srgb
+798.03 473.29 (t01ne) 0 ta
+-0.135 (w) tb
+-0.180 (or) tb
+-0.180 (der) tb gr
+0.9922 0.5725 0.9804 srgb
+628.52 543.19 (f) 0 ta
+-0.090 (eminismo) tb gr
+0.9529 0.5804 0.3137 srgb
+843.30 499.20 (política) .5 0 t
+0.9922 0.5725 0.9804 srgb
+683.86 486.88 (3min) .5 0 t
+0.8588 0.7725 0.5569 srgb
+735.85 531.41 (redes-sociais) .5 0 t
+699.83 586.23 (sala-sete) .5 0 t
+0.8941 0.8000 0.9451 srgb
+512.37 558.84 (ar) 0 ta
+0.180 (te) tb gr
+0.9922 0.5725 0.9804 srgb
+632.05 479.83 (amor) .5 0 t
+0.8588 0.7725 0.5569 srgb
+698.45 571.24 (filmes) .5 0 t
+0.9922 0.5725 0.9804 srgb
+668.60 491.70 (cotidiano) .5 0 t
+0.8588 0.7725 0.5569 srgb
+661.86 569.69 (internet) .5 0 t
+0.9922 0.5725 0.9804 srgb
+693.33 495.64 (5min) .5 0 t
+619.47 521.00 (cr) 0 ta
+-0.180 (ônicas) tb gr
+0.9529 0.5804 0.3137 srgb
+716.18 451.28 (literatura) .5 0 t
+0.8588 0.7725 0.5569 srgb
+767.40 544.74 (vies) .5 0 t
+709.74 546.08 (cinema) .5 0 t
+0.9922 0.5725 0.9804 srgb
+531.25 484.83 (desen) 0 ta
+-0.360 (v) tb
+-0.270 (olvimento-pessoal) tb gr
+0.8941 0.8000 0.9451 srgb
+522.10 571.45 (design) .5 0 t
+0.9922 0.5725 0.9804 srgb
+598.44 507.43 (relacionamentos) .5 0 t
+665.70 473.69 (vida) .5 0 t
+0.9529 0.5804 0.3137 srgb
+768.05 513.34 (politica) .5 0 t
+0.9922 0.5725 0.9804 srgb
+633.28 541.29 (cultura) .5 0 t
+677.06 506.92 (sociedade) .5 0 t
+631.09 507.44 (medium-brasil) .5 0 t
+640.90 541.38 (compor) 0 ta
+0.180 (tamento) tb gr
+721.02 479.71 (brasil) .5 0 t
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+0.00 0.00 1440.00 958.50 cl
+ep
+%%Trailer
+%%Pages: 1
+%%EOF
