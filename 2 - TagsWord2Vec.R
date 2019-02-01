@@ -26,6 +26,61 @@ posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20190101.rds")
 # posts_tbl_processed %>% skim()
 
 ######################################################################################
+# WordCloud & Rank
+
+set.seed(1234)
+
+posts_tbl_processed %>%
+  select(num_range("tag_", 1:5)) %>%
+  gather() %>%
+  select(value) %>%
+  rename(word = value) %>%
+  count(word, sort = TRUE) %>%
+  filter(!is.na(word),
+         word != "") %>%
+  with(wordcloud(word, 
+                 n, 
+                 scale = c(5.25, .55),
+                 random.order = FALSE, 
+                 max.words = 50, 
+                 colors = (brewer.pal(10, "Greys")[5:8]),
+                 rot.per = .25,
+                 use.r.layout = FALSE
+  ))
+### não sei salvar o plot do wordcloud =( usei o RStudio mesmo)
+
+posts_tbl_processed %>%
+  select(num_range("tag_", 1:5)) %>%
+  gather() %>%
+  select(value) %>%
+  rename(word = value) %>%
+  count(word, sort = TRUE) %>%
+  filter(!is.na(word),
+         word != "") %>%
+  top_n(50, wt = n) %>%
+  ggplot(aes(x = reorder(word, n, sum), y = n)) +
+  geom_col() +
+  coord_flip() +
+  labs(title = "Rank das 50 Tags Mais Utilizadas\n") +
+  geom_text(aes(label = n), 
+            angle = 0, 
+            # position = "Left",
+            size = 2.25, 
+            nudge_y = 15, 
+            check_overlap = TRUE) +
+  theme_tufte() +
+  theme(axis.title = element_blank(),
+        axis.text.x = element_text(angle = 90, 
+                                   hjust = 1),
+        axis.text.y = element_text(size = 7))
+
+ggsave("plots/10-rank_tags.png",
+       width = 21,
+       height = 14.85,
+       units = "cm",
+       dpi = 300)
+
+######################################################################################
 # Start h2o
 h2o.init()
 
@@ -71,7 +126,7 @@ w2v.model <- h2o.loadModel(path = load_model_path)
 # Sanity Check
 print(h2o.findSynonyms(w2v.model, "rapidinhas", count = 5))
 
-word_embedings <- h2o.toFrame(w2v.model)
+word_embedings <- as_data_frame(as.data.frame(h2o.toFrame(w2v.model)))
 
 ######################################################################################
 # # PCA Model
@@ -167,6 +222,46 @@ words_tsne %>%
         panel.background = element_rect(fill = "black")) +
   scale_color_manual(values = palheta)
 
+words_tsne %>%
+  left_join(posts_tbl_processed %>% # Get Count
+              select(num_range("tag_", 1:5)) %>%
+              gather() %>%
+              select(value) %>%
+              rename(word = value) %>%
+              count(word, sort = TRUE) %>%
+              filter(!is.na(word),
+                     word != ""),
+            by = c("Word" = "word")) %>%
+  rename("Count" = "n") %>%
+  arrange(desc(Count)) %>%
+  mutate("Count_Norm" = (.$Count - min(.$Count, 
+                                       na.rm = TRUE))/(max(.$Count, 
+                                                           na.rm = TRUE)-min(.$Count, 
+                                                                             na.rm = TRUE))) %>%
+  ggplot(aes(x = X, y = Y, color = as.factor(clhclust))) +
+  # geom_point(size = .5 ) +
+  geom_text(aes(label = Word),
+            position=position_jitter(width = .1,
+                                     height = .1),
+            size = 3,
+            fontface = "bold",
+            alpha = 1,
+            show.legend = FALSE) +
+  theme_tufte() + 
+  theme(axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_rect(fill = "black")) +
+  scale_color_manual(values = palheta)
+
+######################################################################################
+# ?
+tags_tbl <- as_data_frame(tags)
+
+
+tags_tbl %>%
+  filter(str_detect(tags, "(?=.*racismo)(?=.*literatura)"))
+         
 ######################################################################################
 # Things that helped
 # https://github.com/h2oai/h2o-3/blob/master/h2o-r/demos/rdemo.word2vec.craigslistjobtitles.R
