@@ -222,6 +222,11 @@ words_tsne %>%
         panel.background = element_rect(fill = "black")) +
   scale_color_manual(values = palheta)
 
+# Saved via export image on rstudio
+
+######################################################################################
+# Cover art, use count or frequency of tags to set size/alpha after some 
+# normalization and transformation
 words_tsne %>%
   left_join(posts_tbl_processed %>% # Get Count
               select(num_range("tag_", 1:5)) %>%
@@ -237,21 +242,25 @@ words_tsne %>%
   mutate("Count_Norm" = (.$Count - min(.$Count, 
                                        na.rm = TRUE))/(max(.$Count, 
                                                            na.rm = TRUE)-min(.$Count, 
-                                                                             na.rm = TRUE))) %>%
+                                                                             na.rm = TRUE)),
+         "Size" = (Count_Norm * 3) ^ (1/2),
+         # "Size" = 1000000,
+         "Alpha" = Count_Norm ^ (1/2) ) %>% # skim()
   ggplot(aes(x = X, y = Y, color = as.factor(clhclust))) +
   # geom_point(size = .5 ) +
-  geom_text(aes(label = Word),
+  geom_text(aes(label = Word,
+                size = Size,
+                alpha = Alpha + .05),
             position=position_jitter(width = .1,
                                      height = .1),
-            size = 3,
             fontface = "bold",
-            alpha = 1,
+            # size = 30,
             show.legend = FALSE) +
   theme_tufte() + 
   theme(axis.title = element_blank(),
         axis.text = element_blank(),
         axis.ticks = element_blank(),
-        panel.background = element_rect(fill = "black")) +
+        panel.background = element_rect(fill = "black", color = "white")) +
   scale_color_manual(values = palheta)
 
 ######################################################################################
