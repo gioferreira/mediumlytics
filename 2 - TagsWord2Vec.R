@@ -8,6 +8,8 @@ source('src/utils/utils.R')
 
 library(magrittr)
 library(tidyverse)
+# devtools::install_github("elbersb/tidylog")
+library(tidylog)
 library(skimr)
 library(ggthemes)
 library(lubridate)
@@ -124,9 +126,9 @@ load_model_path <- "saved_data/Word2Vec_model_R_1548112930523_2"
 w2v.model <- h2o.loadModel(path = load_model_path)
 
 # Sanity Check
-print(h2o.findSynonyms(w2v.model, "rapidinhas", count = 5))
+print(h2o.findSynonyms(w2v.model, "eden-wiedemann", count = 5))
 
-word_embedings <- as_data_frame(as.data.frame(h2o.toFrame(w2v.model)))
+word_embedings <- as_data_frame(h2o.toFrame(w2v.model))
 
 ######################################################################################
 # # PCA Model
@@ -191,11 +193,11 @@ tsne_result <- as.data.frame(tsne_model$Y)
 words_tsne <- bind_cols(words, tsne_result)  
 names(words_tsne) <- c("Word", "X", "Y")
 
-# Cluster with hdbscan
-clusters <- hdbscan(tsne_result, 
-                    minPts = 5)
-
-words_tsne$clhdb <- clusters$cluster
+# # Cluster with hdbscan
+# clusters <- hdbscan(tsne_result, 
+#                     minPts = 5)
+# 
+# words_tsne$clhdb <- clusters$cluster
 
 # Cluster with hclust
 clusters <-  hclust(dist(scale(tsne_result)),
@@ -264,12 +266,83 @@ words_tsne %>%
   scale_color_manual(values = palheta)
 
 ######################################################################################
-# ?
+# Rank per Group
+
+rank_per_group <- words_tsne %>%
+  left_join(posts_tbl_processed %>% # Get Count
+              select(num_range("tag_", 1:5)) %>%
+              gather() %>%
+              select(value) %>%
+              rename(word = value) %>%
+              count(word, sort = TRUE) %>%
+              filter(!is.na(word),
+                     word != ""),
+            by = c("Word" = "word")) %>%
+  rename("Count" = "n") %>%
+  select(Word, clhclust, Count) %>%
+  filter(!is.na(Word)) %>%
+  group_by(clhclust) %>% 
+  top_n(5, wt = Count) %>%
+  ungroup() %>%
+  arrange(clhclust, Count) %>%
+  mutate(Order = row_number())
+
+rank_per_group %>%  
+  ggplot(aes(x = Order, y = Count, fill = as.factor(clhclust))) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  facet_wrap(vars(clhclust),
+             ncol = 5,
+             scales = "free",
+             drop = TRUE) +
+  scale_x_continuous(
+    breaks = rank_per_group$Order,
+    labels = rank_per_group$Word,
+    expand = c(0,0)
+  ) +
+  coord_flip() +
+  ggtitle("Rank das Tags Mais Utilizadas por Grupo\n") +
+  theme_tufte() +
+  theme(axis.text.x = element_text(angle = 90, vjust = .5),
+        axis.title = element_blank()) +
+  scale_fill_manual(values = palheta)
+  
+ggsave("plots/11-rank_tags.pdf",
+       width = 21*1.3,
+       height = 14.85*1.3,
+       units = "cm",
+       dpi = 300)
+
+######################################################################################
+
 tags_tbl <- as_data_frame(tags)
 
 
-tags_tbl %>%
-  filter(str_detect(tags, "(?=.*racismo)(?=.*literatura)"))
+ansiedade_suicidio <- tags_tbl %>%
+  filter(str_detect(tags, "(?=.*ansiedade)|(?=.*suicídio)")) %>%
+  pull(id)
+
+posts_tbl_processed %>%
+  filter(id %in% ansiedade_suicidio) %>%
+  select(id, total_clap_count, recommends) %>%
+  arrange(desc(recommends, total_clap_count))
+
+hiv_aids <- tags_tbl %>%
+  filter(str_detect(tags, "(?=.*precisamosfalarsobrehiv)|(?=.*aids)|(?=.*hiv)")) %>%
+  pull(id)
+
+posts_tbl_processed %>%
+  filter(id %in% hiv_aids) %>%
+  select(id, total_clap_count, recommends) %>%
+  arrange(desc(recommends, total_clap_count))
+
+rapidinhas <- tags_tbl %>%
+  filter(str_detect(tags, "(?=.*tecnologia)|(?=.*rapidinhas)|(?=.*fotografia)|(?=.*tech)|(?=.*portugal)")) %>%
+  pull(id)
+
+posts_tbl_processed %>%
+  filter(id %in% rapidinhas) %>%
+  select(id, total_clap_count, recommends) %>%
+  arrange(desc(recommends, total_clap_count))
          
 ######################################################################################
 # Things that helped
