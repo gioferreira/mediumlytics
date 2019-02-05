@@ -1,8 +1,7 @@
-# Post 2
+# Post 1
 # Word2Vec Tags
 
-######################################################################################
-# Loading Thigs
+# Loading Thigs ####################################################################################
 
 source('src/utils/utils.R')
 
@@ -20,15 +19,15 @@ library(h2o)
 library(Rtsne)
 library(dbscan)
 
-palheta <- c("#a0e85b", "#d725a3", "#36e515", "#7f2157", "#7ee8c0", "#fe1d66", "#5c922f", "#7835d3", "#e9d737", "#1c4bb4", "#f39450", "#154e56", "#e4ccf1", "#76480d", "#48b6ea", "#ae3028", "#fd92fa", "#115205", "#628df2", "#dbc58e")
+palette <- c("#a0e85b", "#d725a3", "#36e515", "#7f2157", "#7ee8c0", "#fe1d66", "#5c922f", "#7835d3", "#e9d737", "#1c4bb4", "#f39450", "#154e56", "#e4ccf1", "#76480d", "#48b6ea", "#ae3028", "#fd92fa", "#115205", "#628df2", "#dbc58e")
 
 posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20190101.rds")
 
 # Sanity Check
 # posts_tbl_processed %>% skim()
 
-######################################################################################
-# WordCloud & Rank
+
+# WordCloud & Rank #################################################################################
 
 set.seed(1234)
 
@@ -49,7 +48,7 @@ posts_tbl_processed %>%
                  rot.per = .25,
                  use.r.layout = FALSE
   ))
-### não sei salvar o plot do wordcloud =( usei o RStudio mesmo)
+# I don't know how to save an output from wordcloud, I used RStudio Interface
 
 posts_tbl_processed %>%
   select(num_range("tag_", 1:5)) %>%
@@ -82,8 +81,8 @@ ggsave("plots/10-rank_tags.png",
        units = "cm",
        dpi = 300)
 
-######################################################################################
-# Start h2o
+# Start H2O for Word2Vec ###########################################################################
+
 h2o.init()
 
 # Select tags from dataset, concatenate them in one 'phrase'
@@ -114,24 +113,24 @@ tokenize <- function(sentences) {
   # tokenized.words[is.na(tokenized.words) || (! tokenized.words %in% STOP_WORDS),]
 }
 
-# Model or Load Model
 words <- h2o.na_omit(tokenize(tags$tags))
 
+# Model or Load Model
+
 # w2v.model <- h2o.word2vec(words, vec_size = 300, window_size = 3, epochs = 10000)
-# 
 # model_path <- h2o.saveModel(object = w2v.model, path = "saved_data", force = TRUE)
 
 load_model_path <- "saved_data/Word2Vec_model_R_1548112930523_2"
-
 w2v.model <- h2o.loadModel(path = load_model_path)
 
 # Sanity Check
 print(h2o.findSynonyms(w2v.model, "eden-wiedemann", count = 5))
 
-word_embedings <- as_data_frame(h2o.toFrame(w2v.model))
+word_embedings <- as_tibble(h2o.toFrame(w2v.model))
 
-######################################################################################
-# # PCA Model
+
+# PCA Model ########################################################################################
+# Exploratory only. Bad results.
 # 
 # pca_model <- prcomp(as.matrix(word_embedings[,2:301]),
 #                     center = TRUE,
@@ -170,12 +169,13 @@ word_embedings <- as_data_frame(h2o.toFrame(w2v.model))
 #         axis.text = element_blank(),
 #         axis.ticks = element_blank(),
 #         panel.background = element_rect(fill = "black")) +
-#   scale_color_manual(values = palheta)
+#   scale_color_manual(values = palette)
 # 
 # # PCA Model gave bad results, it needed many PCs to explain anything meaningful
-######################################################################################
-# Tsne Model
-# # Model or Load
+
+
+# Tsne Model #######################################################################################
+# Model or Load
 # tsne_model <- Rtsne(as.matrix(word_embedings[,2:301]),
 #                     initial_dims = 300,
 #                     perplexity = 22,
@@ -222,13 +222,12 @@ words_tsne %>%
         axis.text = element_blank(),
         axis.ticks = element_blank(),
         panel.background = element_rect(fill = "black")) +
-  scale_color_manual(values = palheta)
+  scale_color_manual(values = palette)
 
 # Saved via export image on rstudio
 
-######################################################################################
-# Cover art, use count or frequency of tags to set size/alpha after some 
-# normalization and transformation
+# Cover art ########################################################################################
+# Here Iuse count or frequency of tags to set size/alpha after somenormalization and transformation
 words_tsne %>%
   left_join(posts_tbl_processed %>% # Get Count
               select(num_range("tag_", 1:5)) %>%
@@ -263,10 +262,9 @@ words_tsne %>%
         axis.text = element_blank(),
         axis.ticks = element_blank(),
         panel.background = element_rect(fill = "black", color = "white")) +
-  scale_color_manual(values = palheta)
+  scale_color_manual(values = palette)
 
-######################################################################################
-# Rank per Group
+# Rank per Group ###################################################################################
 
 rank_per_group <- words_tsne %>%
   left_join(posts_tbl_processed %>% # Get Count
@@ -304,7 +302,7 @@ rank_per_group %>%
   theme_tufte() +
   theme(axis.text.x = element_text(angle = 90, vjust = .5),
         axis.title = element_blank()) +
-  scale_fill_manual(values = palheta)
+  scale_fill_manual(values = palette)
   
 ggsave("plots/11-rank_tags.pdf",
        width = 21*1.3,
@@ -312,7 +310,7 @@ ggsave("plots/11-rank_tags.pdf",
        units = "cm",
        dpi = 300)
 
-######################################################################################
+# Exploratory ######################################################################################
 
 tags_tbl <- as_data_frame(tags)
 
