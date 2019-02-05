@@ -6,7 +6,6 @@ library(magrittr)
 library(skimr)
 library(ggthemes)
 
-
 # Gerar a base de links a partir do endereço da revista
 
 starting_url <- 'https://medium.com/neworder/latest'
@@ -89,6 +88,9 @@ posts_tbl <- read_rds("saved_data/posts_tbl_20190101.rds")
 # 
 # 
 # write_rds(posts_tbl_processed, "saved_data/posts_tbl_processed_20190101.rds")
+
+
+# First Explorations
 
 posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20190101.rds")
 
@@ -260,10 +262,6 @@ posts_tbl_processed %>%
                        alpha = 0.5)) +
   geom_point(position = "jitter") +
   geom_smooth()#(method = "lm")
-
-
-
-
 
 
 
