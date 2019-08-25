@@ -8,52 +8,52 @@ library(ggthemes)
 
 # Gerar a base de links a partir do endereço da revista
 
-starting_url <- 'https://medium.com/neworder/latest'
-scrape_url <- "https://medium.com/neworder"
-
+# starting_url <- 'https://medium.com/neworder/latest'
+# scrape_url <- "https://medium.com/neworder"
+# 
 # first_req <- make_first_req(starting_url)
 # 
 # content_json <- extract_content(first_req)
 # 
 # url_tbl <- parse_first(content_json, scrape_url = scrape_url)
 # 
-# #ReScraped on 2019 01 01
+# # ReScraped on 2019 08 24
 # url_tbl <- rbind(url_tbl, scrape_more(content_json, scrape_url))
 # 
-# write_rds(url_tbl, "saved_data/url_tbl_20190101.rds")
+# write_rds(url_tbl, "saved_data/url_tbl_20190824.rds")
 
 # Read Saved url_tbl
-url_tbl <- read_rds("saved_data/url_tbl_20190101.rds")
+url_tbl <- read_rds("saved_data/url_tbl_20190824.rds")
 
-# already downloaded as of 2019 01 01 
+# already downloaded as of 2019 08 24 
 #################################################################################
 ## I used only the id + scrapeurl for the download json URL                    ##
 ## But I could use the real url with this "remove accents" line:               ##
 ## gsub("(`|\\'|~|\\^)", "",iconv(url_tbl$url[[i]], to="ASCII//TRANSLIT"))     ##
 #################################################################################
 
-url_tbl <- download_jsons(url_tbl,
-                          scrape_url,
-                          "jsons")
+# url_tbl <- download_jsons(url_tbl,
+#                           scrape_url,
+#                           "jsons")
 
 
 # # Loaded to memmory and exported as rds
 # json_list <- create_json_list("jsons")
 # 
-# write_rds(json_list, "saved_data/json_list_20190101.rds")
+# write_rds(json_list, "saved_data/json_list_20190824.rds")
 
-json_list <- read_rds("saved_data/json_list_20190101.rds")
+json_list <- read_rds("saved_data/json_list_20190824.rds")
 
-# # Saved on 2019 01 01
+# # Saved on 2019 08 24
 # posts_list <- par_process_json_list(json_list)
 # posts_tbl <- as_tibble(do.call(rbind, posts_list))
-# write_rds(posts_tbl, "saved_data/posts_tbl_20190101.rds")
+# write_rds(posts_tbl, "saved_data/posts_tbl_20190824.rds")
 
-posts_tbl <- read_rds("saved_data/posts_tbl_20190101.rds")
+posts_tbl <- read_rds("saved_data/posts_tbl_20190824.rds")
 
 # max_mentioned_users <- max(posts_tbl$mentioned_users_count)
 # names_mentioned_users_id <- c()
-# for(i in 1:max_mentioned_users) names_mentioned_users_id[i] <- paste0("mentioned_user_id_", i)
+# for (i in 1:max_mentioned_users) names_mentioned_users_id[i] <- paste0("mentioned_user_id_", i)
 # 
 # posts_tbl_processed <- posts_tbl %>%
 #   mutate(id = as_factor(id),
@@ -87,12 +87,12 @@ posts_tbl <- read_rds("saved_data/posts_tbl_20190101.rds")
 # #          fill = "right") %>%
 # 
 # 
-# write_rds(posts_tbl_processed, "saved_data/posts_tbl_processed_20190101.rds")
+# write_rds(posts_tbl_processed, "saved_data/posts_tbl_processed_20190824.rds")
 
 
 # First Explorations
 
-posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20190101.rds")
+posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20190824.rds")
 
 posts_tbl_processed %>% skim()
 
@@ -317,14 +317,3 @@ posts_tbl_processed %>%
   theme_tufte() +
   theme(axis.title = element_blank(),
         legend.title = element_blank())
-
-
-
-
-qplot(1:10, 1:10, geom = "blank") + 
-  theme_bw() + 
-  theme(line = element_blank(), text = element_blank()) +
-  # Then I add my table :
-  annotation_custom(grob = tableGrob(my_table))
-kable()
-

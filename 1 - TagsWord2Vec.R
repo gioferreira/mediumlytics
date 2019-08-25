@@ -1,7 +1,7 @@
 # Post 1
 # Word2Vec Tags
 
-# Loading Thigs ####################################################################################
+# Loading Thigs ####
 
 source('src/utils/utils.R')
 
@@ -19,15 +19,17 @@ library(h2o)
 library(Rtsne)
 library(dbscan)
 
-palette <- c("#a0e85b", "#d725a3", "#36e515", "#7f2157", "#7ee8c0", "#fe1d66", "#5c922f", "#7835d3", "#e9d737", "#1c4bb4", "#f39450", "#154e56", "#e4ccf1", "#76480d", "#48b6ea", "#ae3028", "#fd92fa", "#115205", "#628df2", "#dbc58e")
+# palette <- c("#a0e85b", "#d725a3", "#36e515", "#7f2157", "#7ee8c0", "#fe1d66", "#5c922f", "#7835d3", "#e9d737", "#1c4bb4", "#f39450", "#154e56", "#e4ccf1", "#76480d", "#48b6ea", "#ae3028", "#fd92fa", "#115205", "#628df2", "#dbc58e", "#FFe85b", "#aFeFFb")
 
-posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20190101.rds")
+palette <- c("#E5164B", "#39B24B", "#D3B60D", "#4363D7", "#F38131", "#901DB3", "#40D3F4", "#EF32E4", "#8CAF1E", "#F29999", "#46978E", "#E995F4", "#9A6325", "#CCC27F", "#7F0100", "#77E894", "#808000", "#EA5F34", "#000175", "#089CA3", "#78768E", "#A5A49B", "#2B0202", "#615263", "#0F122D")
 
-# Sanity Check
+posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20190824.rds")
+
+# # Sanity Check
 # posts_tbl_processed %>% skim()
 
 
-# WordCloud & Rank #################################################################################
+# WordCloud & Rank ####
 
 set.seed(1234)
 
@@ -41,7 +43,7 @@ posts_tbl_processed %>%
          word != "") %>%
   with(wordcloud(word, 
                  n, 
-                 scale = c(5.25, .55),
+                 scale = c(5.25*.7, .55),
                  random.order = FALSE, 
                  max.words = 50, 
                  colors = (brewer.pal(10, "Greys")[5:8]),
@@ -81,7 +83,7 @@ ggsave("plots/10-rank_tags.png",
        units = "cm",
        dpi = 300)
 
-# Start H2O for Word2Vec ###########################################################################
+# Start H2O for Word2Vec ####
 
 h2o.init()
 
@@ -120,16 +122,16 @@ words <- h2o.na_omit(tokenize(tags$tags))
 # w2v.model <- h2o.word2vec(words, vec_size = 300, window_size = 3, epochs = 10000)
 # model_path <- h2o.saveModel(object = w2v.model, path = "saved_data", force = TRUE)
 
-load_model_path <- "saved_data/Word2Vec_model_R_1548112930523_2"
+load_model_path <- "saved_data/Word2Vec_model_R_1566666480811_1"
 w2v.model <- h2o.loadModel(path = load_model_path)
 
 # Sanity Check
-print(h2o.findSynonyms(w2v.model, "eden-wiedemann", count = 5))
+print(h2o.findSynonyms(w2v.model, "relacionamentos", count = 10))
 
 word_embedings <- as_tibble(h2o.toFrame(w2v.model))
 
 
-# PCA Model ########################################################################################
+# PCA Model ####
 # Exploratory only. Bad results.
 # 
 # pca_model <- prcomp(as.matrix(word_embedings[,2:301]),
@@ -174,8 +176,8 @@ word_embedings <- as_tibble(h2o.toFrame(w2v.model))
 # # PCA Model gave bad results, it needed many PCs to explain anything meaningful
 
 
-# Tsne Model #######################################################################################
-# Model or Load
+# Tsne Model ####
+# # Model or Load
 # tsne_model <- Rtsne(as.matrix(word_embedings[,2:301]),
 #                     initial_dims = 300,
 #                     perplexity = 22,
@@ -183,9 +185,9 @@ word_embedings <- as_tibble(h2o.toFrame(w2v.model))
 #                     max_iter = 20000*2,
 #                     eta = 10)
 # 
-# saveRDS(tsne_model, "saved_data/tsne_model-20190122-a.rds")
+# saveRDS(tsne_model, "saved_data/tsne_model-20190824-a.rds")
 
-tsne_model <- read_rds("saved_data/tsne_model-20190122-a.rds")
+tsne_model <- read_rds("saved_data/tsne_model-20190824-a.rds")
 
 
 words <- as.data.frame(word_embedings$Word)
@@ -203,7 +205,7 @@ names(words_tsne) <- c("Word", "X", "Y")
 clusters <-  hclust(dist(scale(tsne_result)),
                     method = "centroid")
 
-words_tsne$clhclust <- factor(cutree(clusters, k = 20))
+words_tsne$clhclust <- factor(cutree(clusters, k = 25))
 
 
 # Plot hclust
@@ -226,7 +228,7 @@ words_tsne %>%
 
 # Saved via export image on rstudio
 
-# Cover art ########################################################################################
+# Cover art ####
 # Here Iuse count or frequency of tags to set size/alpha after somenormalization and transformation
 words_tsne %>%
   left_join(posts_tbl_processed %>% # Get Count
@@ -244,14 +246,13 @@ words_tsne %>%
                                        na.rm = TRUE))/(max(.$Count, 
                                                            na.rm = TRUE)-min(.$Count, 
                                                                              na.rm = TRUE)),
-         "Size" = (Count_Norm * 3) ^ (1/2),
+         "Size" = (Count_Norm * 3) ^ (1/4),
          # "Size" = 1000000,
-         "Alpha" = Count_Norm ^ (1/2) ) %>% # skim()
+         "Alpha" = Count_Norm ^ (3/4) ) %>% # skim()
   ggplot(aes(x = X, y = Y, color = as.factor(clhclust))) +
-  # geom_point(size = .5 ) +
   geom_text(aes(label = Word,
                 size = Size,
-                alpha = Alpha + .05),
+                alpha = Alpha + .1),
             position=position_jitter(width = .1,
                                      height = .1),
             fontface = "bold",
@@ -264,7 +265,7 @@ words_tsne %>%
         panel.background = element_rect(fill = "black", color = "white")) +
   scale_color_manual(values = palette)
 
-# Rank per Group ###################################################################################
+# Rank per Group ####
 
 rank_per_group <- words_tsne %>%
   left_join(posts_tbl_processed %>% # Get Count
@@ -304,45 +305,44 @@ rank_per_group %>%
         axis.title = element_blank()) +
   scale_fill_manual(values = palette)
   
-ggsave("plots/11-rank_tags.pdf",
+ggsave("plots/11-rank_tags2.pdf",
        width = 21*1.3,
        height = 14.85*1.3,
        units = "cm",
        dpi = 300)
 
-# Exploratory ######################################################################################
+# Exploratory ####
 
-tags_tbl <- as_data_frame(tags)
+tags_tbl <- as_tibble(tags)
 
 
-ansiedade_suicidio <- tags_tbl %>%
-  filter(str_detect(tags, "(?=.*ansiedade)|(?=.*suicídio)")) %>%
+editoria_13 <- tags_tbl %>%
+  filter(str_detect(tags, "(?=.*t02neworder)|(?=.*saúde-mental)|(?=.*depressão)|(?=.*ansiedade)")) %>%
   pull(id)
 
 posts_tbl_processed %>%
-  filter(id %in% ansiedade_suicidio) %>%
+  filter(id %in% editoria_13) %>%
   select(id, total_clap_count, recommends) %>%
   arrange(desc(recommends, total_clap_count))
 
-hiv_aids <- tags_tbl %>%
+editoria_23 <- tags_tbl %>%
   filter(str_detect(tags, "(?=.*precisamosfalarsobrehiv)|(?=.*aids)|(?=.*hiv)")) %>%
   pull(id)
 
 posts_tbl_processed %>%
-  filter(id %in% hiv_aids) %>%
+  filter(id %in% editoria_23) %>%
   select(id, total_clap_count, recommends) %>%
   arrange(desc(recommends, total_clap_count))
 
-rapidinhas <- tags_tbl %>%
-  filter(str_detect(tags, "(?=.*tecnologia)|(?=.*rapidinhas)|(?=.*fotografia)|(?=.*tech)|(?=.*portugal)")) %>%
+editoria_3 <- tags_tbl %>%
+  filter(str_detect(tags, "(?=.*whatsapp)|(?=.*rapidinhas)|(?=.*fotografia)|(?=.*tech)")) %>%
   pull(id)
 
 posts_tbl_processed %>%
-  filter(id %in% rapidinhas) %>%
+  filter(id %in% editoria_3) %>%
   select(id, total_clap_count, recommends) %>%
   arrange(desc(recommends, total_clap_count))
          
-######################################################################################
-# Things that helped
+# Things that helped ####
 # https://github.com/h2oai/h2o-3/blob/master/h2o-r/demos/rdemo.word2vec.craigslistjobtitles.R
 # https://www.r-bloggers.com/playing-with-dimensions-from-clustering-pca-t-sne-to-carl-sagan/

@@ -49,3 +49,4 @@ rsconnect/
 jsons/
 saved_data/
 .Rproj.user
+packrat/lib*/

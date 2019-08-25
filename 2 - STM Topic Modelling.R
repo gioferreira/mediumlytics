@@ -9,23 +9,25 @@ library(furrr)
 library(tidytext)
 library(scales)
 library(ggthemes)
+library(tidylog)
 
-posts_tbl_processed <- read_csv("saved_data/posts_tbl_processed_20181002.csv")
+posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20190824.rds")
 
-# 2018 10 04 Retrain the STM including Tag_1 as Meta
-
+# 2019 08 25 Retrain the STM including Tag_1 as Meta
 posts_txts <- posts_tbl_processed %>%
   select(id,
          user_id,
          first_published_at,
          tag_1,
          text,
-         word_count) %>%
-  filter(!is.na(tag_1),
-         nchar(tag_1) > 3,
-         word_count >= 20) %>%
+         word_count) %>% 
+  arrange(first_published_at) %>%
+  mutate(day_published = first_published_at - min(.$first_published_at)) %>% 
   mutate(first_published_at = floor_date(first_published_at, "days"),
-         day_published = as.integer((first_published_at + days(1)) - min(first_published_at))) %>%
+         day_published = round(as.numeric(day_published, "days")) + 1) %>% 
+  filter(!is.na(tag_1),
+         nchar(as.character(tag_1)) > 3,
+         word_count >= 20) %>%
   select(-first_published_at, -word_count) %>%
   arrange_vars(c("day_published" = 3))
 
@@ -60,10 +62,10 @@ meta <- out$meta
 #                      init.type = "Spectral",
 #                      gamma.prior = "L1")
 # 
-# saveRDS(spectral_init, "saved_data/spectral_init_k0_20181004_add_tag1.rds")
+# saveRDS(spectral_init, "saved_data/spectral_init_k0_20190825_add_tag1.rds")
 
 
-spectral_init <- read_rds("saved_data/spectral_init_k0_20181004_add_tag1.rds")
+spectral_init <- read_rds("saved_data/spectral_init_k0_20190825_add_tag1.rds")
 # Use Tidy Text Method to model stm with different Ks and choosing the best one
 # Re renuning wigh tag as meta
 plan(cluster)
