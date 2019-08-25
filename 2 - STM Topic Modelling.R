@@ -82,7 +82,9 @@ spectral_init <- read_rds("saved_data/spectral_init_k0_20190825_add_tag1.rds")
 # Re renuning wigh tag as meta
 plan(cluster)
 
-many_models <- data_frame(K = c(2:10, seq(12, 20, 2), seq(25, 80, 5))) %>%
+K <- c(2:10, seq(12, 20, 2), seq(25, 80, 5))
+
+many_models <- data_frame(K = K) %>%
   mutate(topic_model = future_map(K,
                                   ~stm(documents = docs,
                                        vocab = vocab,
@@ -91,7 +93,7 @@ many_models <- data_frame(K = c(2:10, seq(12, 20, 2), seq(25, 80, 5))) %>%
                                        data = meta,
                                        verbose = TRUE,
                                        init.type = "Spectral",
-                                       gamma.prior = "L1"),
+                                       gamma.prior = "Pooled"),
                                   .progress = TRUE))
 
 saveRDS(many_models, "saved_data/many_models_20190825_add_tag1.rds")
