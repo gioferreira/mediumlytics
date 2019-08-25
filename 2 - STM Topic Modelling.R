@@ -1,5 +1,6 @@
 # Topic Modelling
 
+# Loading Stuff ####
 source('src/utils/utils.R')
 library(stm)
 library(tidyverse)
@@ -13,18 +14,20 @@ library(tidylog)
 
 posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20190824.rds")
 
-# 2019 08 25 Retrain the STM including Tag_1 as Meta
+
+# Process Texts ####
+
 posts_txts <- posts_tbl_processed %>%
   select(id,
          user_id,
          first_published_at,
          tag_1,
          text,
-         word_count) %>% 
+         word_count) %>%
   arrange(first_published_at) %>%
-  mutate(day_published = first_published_at - min(.$first_published_at)) %>% 
+  mutate(day_published = first_published_at - min(.$first_published_at)) %>%
   mutate(first_published_at = floor_date(first_published_at, "days"),
-         day_published = round(as.numeric(day_published, "days")) + 1) %>% 
+         day_published = round(as.numeric(day_published, "days")) + 1) %>%
   filter(!is.na(tag_1),
          nchar(as.character(tag_1)) > 3,
          word_count >= 20) %>%
@@ -37,21 +40,30 @@ stop_words_total <- unique(c(tm::stopwords('en'),
                              tm::stopwords('pt'),
                              stop_words))
 
-processed_txts <- textProcessor(posts_txts$text, 
-                                metadata = posts_txts,
-                                removestopwords = FALSE,
-                                stem = FALSE,
-                                language = "pt",
-                                customstopwords = stop_words_total)
+# # Process Texts or Load Pre Processed
+# processed_txts <- textProcessor(posts_txts$text, 
+#                                 metadata = posts_txts,
+#                                 removestopwords = FALSE,
+#                                 stem = FALSE,
+#                                 language = "pt",
+#                                 customstopwords = stop_words_total)
+# 
+# write_rds(processed_txts, "saved_data/processed_txts_20190825.rds")
+
+processed_txts <- read_rds("saved_data/processed_txts_20190825.rds")
 
 out <- prepDocuments(processed_txts$documents, 
                      processed_txts$vocab, 
                      processed_txts$meta, 
                      lower.thresh = 25)
 
+
+
 docs <- out$documents
 vocab <- out$vocab
 meta <- out$meta
+
+# 2019 08 25 Retrain the STM including Tag_1 as Meta ####
 
 # # Use spectral init with k = 0 to search for the ideal K
 # spectral_init <- stm(documents = docs,
@@ -64,13 +76,13 @@ meta <- out$meta
 # 
 # saveRDS(spectral_init, "saved_data/spectral_init_k0_20190825_add_tag1.rds")
 
-
 spectral_init <- read_rds("saved_data/spectral_init_k0_20190825_add_tag1.rds")
+
 # Use Tidy Text Method to model stm with different Ks and choosing the best one
 # Re renuning wigh tag as meta
 plan(cluster)
 
-many_models_20181004 <- data_frame(K = seq(2, 74, 4)) %>%
+many_models <- data_frame(K = c(2:10, seq(12, 20, 2), seq(25, 80, 5))) %>%
   mutate(topic_model = future_map(K,
                                   ~stm(documents = docs,
                                        vocab = vocab,
@@ -82,14 +94,14 @@ many_models_20181004 <- data_frame(K = seq(2, 74, 4)) %>%
                                        gamma.prior = "L1"),
                                   .progress = TRUE))
 
-saveRDS(many_models_20181004, "saved_data/many_models_20181004_add_tag1.rds")
+saveRDS(many_models, "saved_data/many_models_20190825_add_tag1.rds")
 
 # Many Models Evaluation
-many_models_20181004 <- readRDS("saved_data/many_models_20181004_add_tag1.rds")
+many_models <- readRDS("saved_data/many_models_20190825_add_tag1.rds")
 heldout <- make.heldout(documents = docs,
                         vocab = vocab)
 
-k_result <- many_models_20181004 %>%
+k_result <- many_models %>%
   mutate(exclusivity = map(topic_model, exclusivity),
          semantic_coherence = map(topic_model, semanticCoherence, docs),
          eval_heldout = map(topic_model, eval.heldout, heldout$missing),
@@ -99,8 +111,8 @@ k_result <- many_models_20181004 %>%
          lbound = bound + lfact,
          iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
 
-saveRDS(k_result, "saved_data/k_result_many_models_20181004_add_tag1.rds")
-k_result <- read_rds("saved_data/k_result_many_models_20181004_add_tag1.rds")
+saveRDS(k_result, "saved_data/k_result_many_models_20190825_add_tag1.rds")
+k_result <- read_rds("saved_data/k_result_many_models_20190825_add_tag1.rds")
 
 k_result %>%
   # filter(K !=46,
@@ -121,7 +133,7 @@ k_result %>%
        title = "Model diagnostics by number of topics",
        subtitle = "Searching for the magical K")
 
-ggsave("plots/many_models_20181004.pdf",
+ggsave("plots/many_models_20190825.pdf",
        width = 19.2,
        height = 10.8,
        units = "cm")
