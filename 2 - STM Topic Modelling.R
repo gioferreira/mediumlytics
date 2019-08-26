@@ -10,7 +10,7 @@ library(furrr)
 library(tidytext)
 library(scales)
 library(ggthemes)
-library(tidylog)
+# library(tidylog)
 
 posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20190824.rds")
 
@@ -41,7 +41,7 @@ stop_words_total <- unique(c(tm::stopwords('en'),
                              stop_words))
 
 # # Process Texts or Load Pre Processed
-# processed_txts <- textProcessor(posts_txts$text, 
+# processed_txts <- textProcessor(posts_txts$text,
 #                                 metadata = posts_txts,
 #                                 removestopwords = FALSE,
 #                                 stem = FALSE,
@@ -80,9 +80,9 @@ spectral_init <- read_rds("saved_data/spectral_init_k0_20190825_add_tag1.rds")
 
 # Use Tidy Text Method to model stm with different Ks and choosing the best one
 # Re renuning wigh tag as meta
-plan(cluster)
+K <- c(2:10, seq(12, 20, 2), seq(24, 48, 4), seq(50, 80, 2))
 
-K <- c(2:10, seq(12, 20, 2), seq(25, 80, 5))
+plan(cluster)
 
 many_models <- data_frame(K = K) %>%
   mutate(topic_model = future_map(K,
@@ -93,7 +93,7 @@ many_models <- data_frame(K = K) %>%
                                        data = meta,
                                        verbose = TRUE,
                                        init.type = "Spectral",
-                                       gamma.prior = "Pooled"),
+                                       gamma.prior = "L1"),
                                   .progress = TRUE))
 
 saveRDS(many_models, "saved_data/many_models_20190825_add_tag1.rds")
@@ -164,7 +164,7 @@ topic_model_54 <- k_result %>%
   pull(topic_model) %>% 
   .[[1]]
 
-## Exploring the topic models
+# Exploring the topic models ####
 
 topic_model <- spectral_init
 
