@@ -78,41 +78,41 @@ meta <- out$meta
 spectral_init <- read_rds("saved_data/spectral_init_k0_20190825_add_tag1.rds")
 
 # Use Tidy Text Method to model stm with different Ks and choosing the best one
-# Re renuning wigh tag as meta
-K <- c(5:10, seq(12, 20, 2), seq(24, 48, 4), seq(50, 70, 2))
-
-plan(cluster)
-
-many_models <- data_frame(K = K) %>%
-  mutate(topic_model = future_map(K,
-                                  ~stm(documents = docs,
-                                       vocab = vocab,
-                                       K = .,
-                                       prevalence = ~ user_id + tag_1 + s(day_published),
-                                       data = meta,
-                                       verbose = TRUE,
-                                       init.type = "Spectral",
-                                       gamma.prior = "L1"),
-                                  .progress = TRUE))
-
-saveRDS(many_models, "saved_data/many_models_20190825_add_tag1.rds")
+# # Re renuning wigh tag as meta
+# K <- c(5:10, seq(12, 20, 2), seq(24, 48, 4), seq(50, 70, 2))
+# 
+# plan(cluster)
+# 
+# many_models <- data_frame(K = K) %>%
+#   mutate(topic_model = future_map(K,
+#                                   ~stm(documents = docs,
+#                                        vocab = vocab,
+#                                        K = .,
+#                                        prevalence = ~ user_id + tag_1 + s(day_published),
+#                                        data = meta,
+#                                        verbose = TRUE,
+#                                        init.type = "Spectral",
+#                                        gamma.prior = "L1"),
+#                                   .progress = TRUE))
+# 
+# saveRDS(many_models, "saved_data/many_models_20190825_add_tag1.rds")
 
 # Many Models Evaluation ####
 many_models <- readRDS("saved_data/many_models_20190825_add_tag1.rds")
 heldout <- make.heldout(documents = docs,
                         vocab = vocab)
 
-k_result <- many_models %>%
-  mutate(exclusivity = map(topic_model, exclusivity),
-         semantic_coherence = map(topic_model, semanticCoherence, docs),
-         eval_heldout = map(topic_model, eval.heldout, heldout$missing),
-         residual = map(topic_model, checkResiduals, docs),
-         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),
-         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),
-         lbound = bound + lfact,
-         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
-
-saveRDS(k_result, "saved_data/k_result_many_models_20190825_add_tag1.rds")
+# k_result <- many_models %>%
+#   mutate(exclusivity = map(topic_model, exclusivity),
+#          semantic_coherence = map(topic_model, semanticCoherence, docs),
+#          eval_heldout = map(topic_model, eval.heldout, heldout$missing),
+#          residual = map(topic_model, checkResiduals, docs),
+#          bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),
+#          lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),
+#          lbound = bound + lfact,
+#          iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
+# 
+# saveRDS(k_result, "saved_data/k_result_many_models_20190825_add_tag1.rds")
 k_result <- read_rds("saved_data/k_result_many_models_20190825_add_tag1.rds")
 
 k_result %>%
