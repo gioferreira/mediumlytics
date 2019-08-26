@@ -79,7 +79,7 @@ spectral_init <- read_rds("saved_data/spectral_init_k0_20190825_add_tag1.rds")
 
 # Use Tidy Text Method to model stm with different Ks and choosing the best one
 # # Re renuning wigh tag as meta
-# K <- c(5:10, seq(12, 20, 2), seq(24, 48, 4), seq(50, 70, 2))
+K <- c(5:10, seq(12, 20, 2), seq(24, 48, 4), seq(50, 70, 2))
 # 
 # plan(cluster)
 # 
@@ -127,7 +127,7 @@ k_result %>%
   gather(Metric, Value, -K) %>%
   ggplot(aes(K, Value, color = Metric)) +
   geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +
-  # coord_cartesian(ylim = 2.1) +
+  scale_x_continuous(breaks = K) +
   facet_wrap(~Metric, scales = "free_y") +
   labs(x = "K (number of topics)",
        y = NULL,
@@ -135,37 +135,46 @@ k_result %>%
        subtitle = "Searching for the magical K")
 
 ggsave("plots/many_models_20190825.pdf",
-       width = 19.2,
-       height = 10.8,
+       width = 19.2*1.8,
+       height = 10.8*1.8,
        units = "cm")
 
-# Follow up evaluation using many_models_20181002 with 22, 26, 34, 44, 54 topics. ####
+# Follow up evaluation using many_models_20190826 with 7, 12, 18, 36, 44, 52 ,62 topics. ####
+# and then 7, 18, 36, 44, 52
+# and then 18, 36, 44, 52
+# and then 18, 36, 52
 k_result %>%
   select(K, exclusivity, semantic_coherence) %>%
-  filter(K %in% c(22, 26, 34, 54)) %>%
+  filter(K %in% c(18, 36, 52)) %>%
   unnest() %>%
   mutate(K = as.factor(K)) %>%
   ggplot(aes(semantic_coherence, exclusivity, color = K)) +
   geom_point(size = 2, alpha = 0.7) +
+  scale_color_tableau() +
   labs(x = "Semantic coherence",
        y = "Exclusivity",
        title = "Comparing exclusivity and semantic coherence",
        subtitle = "Models with fewer topics have higher semantic coherence for more topics, but lower exclusivity")
 
-## Extracting topic_model with 22 & 54 topics 
-topic_model_22 <- k_result %>% 
-  filter(K == 22) %>% 
+## Extracting topic_model with 18, 36, 52
+topic_model_18 <- k_result %>% 
+  filter(K == 18) %>% 
   pull(topic_model) %>% 
   .[[1]]
 
-topic_model_54 <- k_result %>% 
-  filter(K == 54) %>% 
+topic_model_36 <- k_result %>% 
+  filter(K == 36) %>% 
+  pull(topic_model) %>% 
+  .[[1]]
+
+topic_model_52 <- k_result %>% 
+  filter(K == 52) %>% 
   pull(topic_model) %>% 
   .[[1]]
 
 # Exploring the topic models ####
 
-topic_model <- spectral_init
+topic_model <- topic_model_18
 
 td_beta <- tidy(topic_model)
 td_gamma <- tidy(topic_model, matrix = "gamma",
@@ -194,8 +203,8 @@ gamma_terms %>%
   kable(digits = 3, 
         col.names = c("Topic", "Expected topic proportion", "Top 7 terms"))
 
-labelTopics(topic_model, c(4, 27, 3, 32, 18, 42))
-findThoughts(model = topic_model, texts = meta$id, topics = c(4, 27, 3, 32, 18, 42))
+labelTopics(topic_model, c(7, 1, 12, 17, 4, 2))
+findThoughts(model = topic_model, texts = meta$id, topics = c(7, 1, 12, 17, 4, 2))
 
 # Comment on this: https://github.com/bstewart/stm/issues/152
 # read: http://www.periodicos.letras.ufmg.br/index.php/relin/article/view/8916/8803
