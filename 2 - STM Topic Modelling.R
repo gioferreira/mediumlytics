@@ -79,7 +79,7 @@ spectral_init <- read_rds("saved_data/spectral_init_k0_20190825_add_tag1.rds")
 
 # Use Tidy Text Method to model stm with different Ks and choosing the best one
 # Re renuning wigh tag as meta
-K <- c(2:10, seq(12, 20, 2), seq(24, 48, 4), seq(50, 80, 2))
+K <- c(5:10, seq(12, 20, 2), seq(24, 48, 4), seq(50, 70, 2))
 
 plan(cluster)
 
