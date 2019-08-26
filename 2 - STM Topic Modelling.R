@@ -16,7 +16,6 @@ posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20190824.rds")
 
 
 # Process Texts ####
-
 posts_txts <- posts_tbl_processed %>%
   select(id,
          user_id,
@@ -98,7 +97,7 @@ many_models <- data_frame(K = K) %>%
 
 saveRDS(many_models, "saved_data/many_models_20190825_add_tag1.rds")
 
-# Many Models Evaluation
+# Many Models Evaluation ####
 many_models <- readRDS("saved_data/many_models_20190825_add_tag1.rds")
 heldout <- make.heldout(documents = docs,
                         vocab = vocab)
@@ -140,7 +139,7 @@ ggsave("plots/many_models_20190825.pdf",
        height = 10.8,
        units = "cm")
 
-# Follow up evaluation using many_models_20181002 with 22, 26, 34, 44, 54 topics.
+# Follow up evaluation using many_models_20181002 with 22, 26, 34, 44, 54 topics. ####
 k_result %>%
   select(K, exclusivity, semantic_coherence) %>%
   filter(K %in% c(22, 26, 34, 54)) %>%
@@ -195,8 +194,8 @@ gamma_terms %>%
   kable(digits = 3, 
         col.names = c("Topic", "Expected topic proportion", "Top 7 terms"))
 
-labelTopics(topic_model, c(1, 6, 5, 3, 21, 7))
-findThoughts(model = topic_model, texts = meta$user_id, topics = c(1, 6, 3, 7))
+labelTopics(topic_model, c(4, 27, 3, 32, 18, 42))
+findThoughts(model = topic_model, texts = meta$id, topics = c(4, 27, 3, 32, 18, 42))
 
 # Comment on this: https://github.com/bstewart/stm/issues/152
 # read: http://www.periodicos.letras.ufmg.br/index.php/relin/article/view/8916/8803
