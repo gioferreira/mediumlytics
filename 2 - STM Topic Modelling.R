@@ -62,7 +62,7 @@ docs <- out$documents
 vocab <- out$vocab
 meta <- out$meta
 
-# 2019 08 25 Retrain the STM including Tag_1 as Meta ####
+# 2019 08 25 Retrained the STM including Tag_1 as Meta ####
 
 # # Use spectral init with k = 0 to search for the ideal K
 # spectral_init <- stm(documents = docs,
@@ -145,7 +145,7 @@ ggsave("plots/many_models_20190825.pdf",
 # and then 18, 36, 52
 k_result %>%
   select(K, exclusivity, semantic_coherence) %>%
-  filter(K %in% c(18, 36, 52)) %>%
+  filter(K %in% c(7, 36)) %>%
   unnest() %>%
   mutate(K = as.factor(K)) %>%
   ggplot(aes(semantic_coherence, exclusivity, color = K)) +
@@ -153,12 +153,12 @@ k_result %>%
   scale_color_tableau() +
   labs(x = "Semantic coherence",
        y = "Exclusivity",
-       title = "Comparing exclusivity and semantic coherence",
+       title = "Comparing exclusivity and semantic coherence for every topic",
        subtitle = "Models with fewer topics have higher semantic coherence for more topics, but lower exclusivity")
 
-## Extracting topic_model with 18, 36, 52
-topic_model_18 <- k_result %>% 
-  filter(K == 18) %>% 
+## Extracting topic_model with 7, 36
+topic_model_7 <- k_result %>% 
+  filter(K == 7) %>% 
   pull(topic_model) %>% 
   .[[1]]
 
@@ -167,14 +167,9 @@ topic_model_36 <- k_result %>%
   pull(topic_model) %>% 
   .[[1]]
 
-topic_model_52 <- k_result %>% 
-  filter(K == 52) %>% 
-  pull(topic_model) %>% 
-  .[[1]]
-
 # Exploring the topic models ####
 
-topic_model <- topic_model_18
+topic_model <- topic_model_7
 
 td_beta <- tidy(topic_model)
 td_gamma <- tidy(topic_model, matrix = "gamma",
@@ -205,6 +200,46 @@ gamma_terms %>%
 
 labelTopics(topic_model, c(7, 1, 12, 17, 4, 2))
 findThoughts(model = topic_model, texts = meta$id, topics = c(7, 1, 12, 17, 4, 2))
+
+ggplot(td_gamma, aes(gamma, fill = as.factor(topic))) +
+  geom_histogram(alpha = 0.8, show.legend = FALSE) +
+  facet_wrap(~ topic, ncol = 3) +
+  labs(title = "Distribution of document probabilities for each topic",
+       # subtitle = "Each topic is associated with 1-3 stories",
+       y = "Number of stories", x = expression(gamma))
+
+
+gamma_terms %>%
+  # top_n(20, gamma) %>%
+  ggplot(aes(topic, gamma, label = terms, fill = topic)) +
+  geom_col(show.legend = FALSE) +
+  geom_text(hjust = 0, nudge_y = 0.001, size = 3.2) +
+  coord_flip() +
+  scale_y_continuous(expand = c(0,0),
+                     limits = c(0, 0.1),
+                     labels = percent_format()) +
+  theme_tufte(ticks = FALSE) +
+  theme(plot.title = element_text(size = 16),
+        plot.subtitle = element_text(size = 13)) +
+  labs(x = NULL, y = expression(gamma),
+       title = "Top 36 topics by prevalence in New Order corpus",
+       subtitle = "With the top words that contribute to each topic")
+
+gamma_terms %>%
+  # top_n(20, gamma) %>%
+  ggplot(aes(topic, gamma, label = terms, fill = topic)) +
+  geom_col(show.legend = FALSE) +
+  geom_text(hjust = 0, nudge_y = 0.01, size = 3.5) +
+  coord_flip() +
+  scale_y_continuous(expand = c(0,0),
+                     limits = c(0, 0.5),
+                     labels = percent_format()) +
+  theme_tufte(ticks = FALSE) +
+  theme(plot.title = element_text(size = 16),
+        plot.subtitle = element_text(size = 13)) +
+  labs(x = NULL, y = expression(gamma),
+       title = "Top 7 topics by prevalence in New Order corpus",
+       subtitle = "With the top words that contribute to each topic")
 
 # Comment on this: https://github.com/bstewart/stm/issues/152
 # read: http://www.periodicos.letras.ufmg.br/index.php/relin/article/view/8916/8803
