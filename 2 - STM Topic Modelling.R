@@ -12,10 +12,11 @@ library(scales)
 library(ggthemes)
 # library(tidylog)
 
-posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20190824.rds")
+
 
 
 # Process Texts ####
+posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20190824.rds")
 posts_txts <- posts_tbl_processed %>%
   select(id,
          user_id,
@@ -99,6 +100,7 @@ K <- c(5:10, seq(12, 20, 2), seq(24, 48, 4), seq(50, 70, 2))
 
 # Many Models Evaluation ####
 many_models <- readRDS("saved_data/many_models_20190825_add_tag1.rds")
+
 heldout <- make.heldout(documents = docs,
                         vocab = vocab)
 
@@ -141,11 +143,11 @@ ggsave("plots/many_models_20190825.pdf",
 
 # Follow up evaluation using many_models_20190826 with 7, 12, 18, 36, 44, 52 ,62 topics. ####
 # and then 7, 18, 36, 44, 52
-# and then 18, 36, 44, 52
-# and then 18, 36, 52
+# and then 7, 18, 36, 52
+# and then 7, 18, 36
 k_result %>%
   select(K, exclusivity, semantic_coherence) %>%
-  filter(K %in% c(7, 36)) %>%
+  filter(K %in% c(7, 18, 36)) %>%
   unnest() %>%
   mutate(K = as.factor(K)) %>%
   ggplot(aes(semantic_coherence, exclusivity, color = K)) +
@@ -156,20 +158,24 @@ k_result %>%
        title = "Comparing exclusivity and semantic coherence for every topic",
        subtitle = "Models with fewer topics have higher semantic coherence for more topics, but lower exclusivity")
 
-## Extracting topic_model with 7, 36
-topic_model_7 <- k_result %>% 
+# Extracting topic_models with 7, 18, 36 ####
+topic_model_7 <- many_models %>% 
   filter(K == 7) %>% 
   pull(topic_model) %>% 
   .[[1]]
 
-topic_model_36 <- k_result %>% 
+topic_model_18 <- many_models %>% 
+  filter(K == 18) %>% 
+  pull(topic_model) %>% 
+  .[[1]]
+
+topic_model_36 <- many_models %>% 
   filter(K == 36) %>% 
   pull(topic_model) %>% 
   .[[1]]
 
 # Exploring the topic models ####
-
-topic_model <- topic_model_7
+topic_model <- topic_model_36
 
 td_beta <- tidy(topic_model)
 td_gamma <- tidy(topic_model, matrix = "gamma",
@@ -198,49 +204,153 @@ gamma_terms %>%
   kable(digits = 3, 
         col.names = c("Topic", "Expected topic proportion", "Top 7 terms"))
 
-labelTopics(topic_model, c(7, 1, 12, 17, 4, 2))
-findThoughts(model = topic_model, texts = meta$id, topics = c(7, 1, 12, 17, 4, 2))
+# ggplot(td_gamma, aes(gamma, fill = as.factor(topic))) +
+#   geom_histogram(alpha = 0.8, show.legend = FALSE) +
+#   facet_wrap(~ topic, ncol = 3) +
+#   labs(title = "Distribution of document probabilities for each topic",
+#        # subtitle = "Each topic is associated with 1-3 stories",
+#        y = "Number of stories", x = expression(gamma))
+# 
+# 
+# gamma_terms %>%
+#   # top_n(20, gamma) %>%
+#   ggplot(aes(topic, gamma, label = terms, fill = topic)) +
+#   geom_col(show.legend = FALSE) +
+#   geom_text(hjust = 0, nudge_y = 0.001, size = 3.2) +
+#   coord_flip() +
+#   scale_y_continuous(expand = c(0,0),
+#                      limits = c(0, 0.1),
+#                      labels = percent_format()) +
+#   theme_tufte(ticks = FALSE) +
+#   theme(plot.title = element_text(size = 16),
+#         plot.subtitle = element_text(size = 13)) +
+#   labs(x = NULL, y = expression(gamma),
+#        title = "Top 36 topics by prevalence in New Order corpus",
+#        subtitle = "With the top words that contribute to each topic")
+# 
+# gamma_terms %>%
+#   # top_n(20, gamma) %>%
+#   ggplot(aes(topic, gamma, label = terms, fill = topic)) +
+#   geom_col(show.legend = FALSE) +
+#   geom_text(hjust = 0, nudge_y = 0.01, size = 3.5) +
+#   coord_flip() +
+#   scale_y_continuous(expand = c(0,0),
+#                      limits = c(0, 0.5),
+#                      labels = percent_format()) +
+#   theme_tufte(ticks = FALSE) +
+#   theme(plot.title = element_text(size = 16),
+#         plot.subtitle = element_text(size = 13)) +
+#   labs(x = NULL, y = expression(gamma),
+#        title = "Top 7 topics by prevalence in New Order corpus",
+#        subtitle = "With the top words that contribute to each topic")
 
-ggplot(td_gamma, aes(gamma, fill = as.factor(topic))) +
-  geom_histogram(alpha = 0.8, show.legend = FALSE) +
-  facet_wrap(~ topic, ncol = 3) +
-  labs(title = "Distribution of document probabilities for each topic",
-       # subtitle = "Each topic is associated with 1-3 stories",
-       y = "Number of stories", x = expression(gamma))
-
-
-gamma_terms %>%
-  # top_n(20, gamma) %>%
-  ggplot(aes(topic, gamma, label = terms, fill = topic)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(hjust = 0, nudge_y = 0.001, size = 3.2) +
+td_beta %>%
+  group_by(topic) %>%
+  top_n(10, beta) %>%
+  ungroup() %>%
+  mutate(#topic = paste0("Topic ", topic),
+         term = reorder_within(term, beta, topic)) %>%
+  ggplot(aes(term, beta, fill = as.factor(topic))) +
+  geom_col(alpha = 0.8, show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free_y") +
   coord_flip() +
-  scale_y_continuous(expand = c(0,0),
-                     limits = c(0, 0.1),
-                     labels = percent_format()) +
-  theme_tufte(ticks = FALSE) +
-  theme(plot.title = element_text(size = 16),
-        plot.subtitle = element_text(size = 13)) +
-  labs(x = NULL, y = expression(gamma),
-       title = "Top 36 topics by prevalence in New Order corpus",
-       subtitle = "With the top words that contribute to each topic")
+  scale_x_reordered() +
+  labs(x = NULL, y = expression(beta),
+       title = "Highest word probabilities for each topic for 36 topics model",
+       subtitle = "Different words are associated with different topics")
 
-gamma_terms %>%
-  # top_n(20, gamma) %>%
-  ggplot(aes(topic, gamma, label = terms, fill = topic)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(hjust = 0, nudge_y = 0.01, size = 3.5) +
-  coord_flip() +
-  scale_y_continuous(expand = c(0,0),
-                     limits = c(0, 0.5),
-                     labels = percent_format()) +
-  theme_tufte(ticks = FALSE) +
-  theme(plot.title = element_text(size = 16),
-        plot.subtitle = element_text(size = 13)) +
-  labs(x = NULL, y = expression(gamma),
-       title = "Top 7 topics by prevalence in New Order corpus",
-       subtitle = "With the top words that contribute to each topic")
+# Labelling Topic Modelss ####
+labelTopics(topic_model_36)
 
+# Extract Links
+extract_links <- function(thoughts, url_tbl) {
+  docs <- thoughts$docs
+  process_doc <- function(doc, ...) {
+    out <- enframe(doc, name = NULL, value = "id") %>% 
+      left_join(url_tbl) %>% 
+      select(-unique_slug)
+    return(out)
+  }
+  out <- map(docs, process_doc, url_tbl = url_tbl)
+  return(out)
+}
+
+url_tbl <- read_rds("saved_data/url_tbl_20190824.rds")
+
+thoughts <- findThoughts(model = topic_model_36, texts = as.character(meta$id), n = 5)
+
+
+links_7 <- extract_links(thoughts, url_tbl)
+links_18 <- extract_links(thoughts, url_tbl)
+links_36 <- extract_links(thoughts, url_tbl)
+# 7 Topic Titles
+# 1 Vida/cronicas
+# 2 cinema/arte/tv
+# 3 internet/redes_sociais/tecnologia
+# 4 mulheres/feminismo/sociedade
+# 5 literatura/escrita
+# 6 política
+# 7 relacionamentos
+
+# 18 Topic Titles
+# 1 cotidiano
+# 2 cinema/tv
+# 3 design/publicidade
+# 4 relacionamento
+# 5 música
+# 6 vida/ciência/humanidade
+# 7 vida/amor/felicidade
+# 8 letter/cassio/revista
+# 9 vida/educação/paternidade
+# 10 tv
+# 11 dinheiro/futebol/marca/empresa
+# 12 política nacional
+# 13 tecnologia/rapidinhas
+# 14 gênero
+# 15 internet/redes sociais
+# 16 literatura/escrita
+# 17 cronica/contos/escrita
+# 18 scoeidade/filosofia/cultura
+
+# 36
+# 1 Gente/vida/cotidiano
+# 2 Cinema/Oscars
+# 3 Cronica/Sociedade/Comportamento
+# 4 Relacionamentos/sentimentos/babaca/cansei
+# 5 Literatura/ficção/quadrinhos
+# 6 Consciência/espiritualidade/Meditação
+# 7 Relacionamentos/amor
+# 8 Redação/Trendr/New Order/Letter
+# 9 Dinheiro/consumo
+# 10 Novela/TV
+# 11 Facebook/Redes Sociais/Conteúdo/Serviços Digitais
+# 12 Política Nacional/Presidente
+# 13 Ensino/Educação/Aprendizagem
+# 14 Religão/Moral/Socieadde/Crenças
+# 15 Instagram/Redes Sociais/Internet
+# 16 Escrita/Texto/Língua Portuguesa
+# 17 Rio de Janeiro/Polícia/Carnaval/Violência
+# 18 Sociedade/Capitalimso/Economia/Filosofia
+# 19 Vida Adulta/Felicidade/Resiliência/Bolha
+# 20 Rock/Música/Rap
+# 21 Séries
+# 22 Design/Arte/Publicidade/Mmouranet
+# 23 New Order/Cassio/Temporadas/Diversidade/Cultura  
+# 24 Rapidinhas/Tecnologia
+# 25 Fake News/Informação/Notícia
+# 26 Vida/Universo/Morte/Estrelas/Céu
+# 27 Dor Emocional/Depressão/Ansiedade/Dor
+# 28 Emprego/Trabalho/Refroma da Previdência/Empresa
+# 29 Arte/Cultura/Museus/Espaços Culturais
+# 30 Casa/Família/Mãe/Pai/Filhos
+# 31 Violência/Homem/Mulher/Estupro/Corpo
+# 32 Democracia/Política/Esquerda/Bolsonaro/Corrupção
+# 33 Genêro/Feminismo/Gay/Lésbica/Machismo
+# 34 Ciência/Tecnologia/Nasa/Pesquisa
+# 35 Filme/Heróis/Batman/Marvel/Franquias
+# 36 Futebol/Atletas/Esporte/Time
+
+# References ####  
 # Comment on this: https://github.com/bstewart/stm/issues/152
 # read: http://www.periodicos.letras.ufmg.br/index.php/relin/article/view/8916/8803
 # read: https://estudogeral.sib.uc.pt/bitstream/10316/35724/1/Semantic%20Topic%20Modelling.pdf
