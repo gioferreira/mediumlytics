@@ -266,8 +266,8 @@ labelTopics(topic_model_36)
 extract_links <- function(thoughts, url_tbl) {
   docs <- thoughts$docs
   process_doc <- function(doc, ...) {
-    out <- enframe(doc, name = NULL, value = "id") %>% 
-      left_join(url_tbl) %>% 
+    out <- enframe(doc, name = NULL, value = "id") %>%
+      left_join(url_tbl) %>%
       select(-unique_slug)
     return(out)
   }
