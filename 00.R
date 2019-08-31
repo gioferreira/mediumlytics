@@ -1,4 +1,3 @@
-# Post 1
 # Análise Descritiva
 
 source('src/utils/utils.R')
