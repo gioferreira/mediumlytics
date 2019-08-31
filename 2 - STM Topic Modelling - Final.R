@@ -323,7 +323,7 @@ topic_labels <- tribble(
   11, "Facebook-Redes_Sociais-Conteúdo-Serviços_Digitais",
   12, "Política_Nacional-Presidente",
   13, "Ensino-Educação-Aprendizagem",
-  14, "Religão-Moral-Socieadde-Crenças",
+  14, "Religão-Moral-Sociedade-Crenças",
   15, "Instagram-Redes_Sociais-Internet",
   16, "Escrita-Texto-Língua_Portuguesa",
   17, "Rio_de_Janeiro-Polícia-Carnaval-Violência",
@@ -349,7 +349,6 @@ topic_labels <- tribble(
 )
 # These topic labels were hand created using common words, slug information and some reading.
 # Making new Plots using the labels ####
-
 gamma_terms %>%
   mutate(topic = as.character(topic)) %>%
   left_join(topic_labels %>% 
@@ -377,7 +376,32 @@ ggsave("plots/named_topics_by_prevalence.png",
        height = 20,
        units = "cm")
 
+library(GGally)
+library(network)
+library(sna)
+corr <- topicCorr(topic_model)
+net <- network(corr$posadj, directed = FALSE)
 
+set.seed(1312)
+ggnet2(net,
+       size = round(gamma_terms$gamma * 250)*2,
+       edge.lty = "dotted",
+       edge.color = "black",
+       layout.exp = 0.3) +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 16)) +
+  geom_point(color = "grey") +
+  geom_text(
+    aes(label = topic_labels$label), 
+    color = "black",
+    size = 3,
+    nudge_y = rep(c(-.02, .02), 18)) +
+  labs(title = "Topic Correlation Network")
+
+ggsave("plots/topics_correlation_net.eps",
+       width = 25*1.25,
+       height = 20*1.25,
+       units = "cm")
 # Extract TD Gamma to Merge with posts_tbl_processed ####
 
 posts_tbl_topics <- posts_tbl_processed %>%
