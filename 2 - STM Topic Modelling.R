@@ -346,7 +346,10 @@ topic_labels <- tribble(
   34, "Ciência-Tecnologia-Nasa-Pesquisa",
   35, "Filme-Heróis-Batman-Marvel-Franquias",
   36, "Futebol-Atletas-Esporte-Time"
-)
+) %>% 
+  mutate(label = as_factor(label))
+
+saveRDS(topic_labels, "saved_data/topic_labels.rds")
 # These topic labels were hand created using common words, slug information and some reading.
 # Making new Plots using the labels ####
 gamma_terms %>%
@@ -422,11 +425,16 @@ posts_tbl_topics <- posts_tbl_processed %>%
       ) %>% 
       select(-document) %>% 
       arrange_vars(c("id" = 1))
-  )
+  ) %>% 
+  left_join(topic_labels,
+            by = c("prevalent_topic" = "topic"))
+
+
+
+
 
 write_rds(posts_tbl_topics, "saved_data/posts_tbl_topics-20190829.rds")
   
-
 
   
 # References ####  
