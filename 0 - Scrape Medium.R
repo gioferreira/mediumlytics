@@ -6,8 +6,8 @@ library(magrittr)
 library(skimr)
 library(ggthemes)
 
-# Gerar a base de links a partir do endereço da revista
-
+# # Gerar a base de links a partir do endereço da revista
+# 
 # starting_url <- 'https://medium.com/neworder/latest'
 # scrape_url <- "https://medium.com/neworder"
 # 
@@ -16,16 +16,16 @@ library(ggthemes)
 # content_json <- extract_content(first_req)
 # 
 # url_tbl <- parse_first(content_json, scrape_url = scrape_url)
-# 
-# # ReScraped on 2019 08 24
+
+# # ReScraped on 2019 12 01
 # url_tbl <- rbind(url_tbl, scrape_more(content_json, scrape_url))
 # 
-# write_rds(url_tbl, "saved_data/url_tbl_20190824.rds")
+# write_rds(url_tbl, "saved_data/url_tbl_20191201.rds")
 
 # Read Saved url_tbl
-url_tbl <- read_rds("saved_data/url_tbl_20190824.rds")
+url_tbl <- read_rds("saved_data/url_tbl_20191201.rds")
 
-# already downloaded as of 2019 08 24 
+# already downloaded as of 2019 12 01 
 #################################################################################
 ## I used only the id + scrapeurl for the download json URL                    ##
 ## But I could use the real url with this "remove accents" line:               ##
@@ -40,20 +40,20 @@ url_tbl <- read_rds("saved_data/url_tbl_20190824.rds")
 # # Loaded to memmory and exported as rds
 # json_list <- create_json_list("jsons")
 # 
-# write_rds(json_list, "saved_data/json_list_20190824.rds")
+# write_rds(json_list, "saved_data/json_list_20191201.rds")
 
-json_list <- read_rds("saved_data/json_list_20190824.rds")
+json_list <- read_rds("saved_data/json_list_20191201.rds")
 
-# # Saved on 2019 08 24
+# # Saved on 2019 12 01
 # posts_list <- par_process_json_list(json_list)
 # posts_tbl <- as_tibble(do.call(rbind, posts_list))
-# write_rds(posts_tbl, "saved_data/posts_tbl_20190824.rds")
+# write_rds(posts_tbl, "saved_data/posts_tbl_20191201.rds")
 
-posts_tbl <- read_rds("saved_data/posts_tbl_20190824.rds")
+posts_tbl <- read_rds("saved_data/posts_tbl_20191201.rds")
 
-# max_mentioned_users <- max(posts_tbl$mentioned_users_count)
-# names_mentioned_users_id <- c()
-# for (i in 1:max_mentioned_users) names_mentioned_users_id[i] <- paste0("mentioned_user_id_", i)
+# # max_mentioned_users <- max(posts_tbl$mentioned_users_count)
+# # names_mentioned_users_id <- c()
+# # for (i in 1:max_mentioned_users) names_mentioned_users_id[i] <- paste0("mentioned_user_id_", i)
 # 
 # posts_tbl_processed <- posts_tbl %>%
 #   mutate(id = as_factor(id),
@@ -87,12 +87,12 @@ posts_tbl <- read_rds("saved_data/posts_tbl_20190824.rds")
 # #          fill = "right") %>%
 # 
 # 
-# write_rds(posts_tbl_processed, "saved_data/posts_tbl_processed_20190824.rds")
+# write_rds(posts_tbl_processed, "saved_data/posts_tbl_processed_20191201.rds")
 
 
 # First Explorations
 
-posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20190824.rds")
+posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20191201.rds")
 
 posts_tbl_processed %>% skim()
 
@@ -317,3 +317,4 @@ posts_tbl_processed %>%
   theme_tufte() +
   theme(axis.title = element_blank(),
         legend.title = element_blank())
+

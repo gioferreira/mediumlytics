@@ -8,7 +8,7 @@ source('src/utils/utils.R')
 library(magrittr)
 library(tidyverse)
 # devtools::install_github("elbersb/tidylog")
-library(tidylog)
+# library(tidylog)
 library(skimr)
 library(ggthemes)
 library(lubridate)
@@ -23,7 +23,7 @@ library(dbscan)
 
 palette <- c("#E5164B", "#39B24B", "#D3B60D", "#4363D7", "#F38131", "#901DB3", "#40D3F4", "#EF32E4", "#8CAF1E", "#F29999", "#46978E", "#E995F4", "#9A6325", "#CCC27F", "#7F0100", "#77E894", "#808000", "#EA5F34", "#000175", "#089CA3", "#78768E", "#A5A49B", "#2B0202", "#615263", "#0F122D")
 
-posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20190824.rds")
+posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20191201.rds")
 
 # # Sanity Check
 # posts_tbl_processed %>% skim()
@@ -69,8 +69,7 @@ posts_tbl_processed %>%
             angle = 0, 
             # position = "Left",
             size = 2.25, 
-            nudge_y = 15, 
-            check_overlap = TRUE) +
+            nudge_y = 20) +
   theme_tufte() +
   theme(axis.title = element_blank(),
         axis.text.x = element_text(angle = 90, 
@@ -117,16 +116,16 @@ tokenize <- function(sentences) {
 
 words <- h2o.na_omit(tokenize(tags$tags))
 
-# Model or Load Model
-
+# # Model or Load Model
+# 
 # w2v.model <- h2o.word2vec(words, vec_size = 300, window_size = 3, epochs = 10000)
 # model_path <- h2o.saveModel(object = w2v.model, path = "saved_data", force = TRUE)
 
-load_model_path <- "saved_data/Word2Vec_model_R_1566666480811_1"
+load_model_path <- "saved_data/Word2Vec_model_R_1575286786258_1"
 w2v.model <- h2o.loadModel(path = load_model_path)
 
 # Sanity Check
-print(h2o.findSynonyms(w2v.model, "relacionamentos", count = 10))
+print(h2o.findSynonyms(w2v.model, "rapidinhas", count = 10))
 
 word_embedings <- as_tibble(h2o.toFrame(w2v.model))
 
@@ -176,7 +175,7 @@ word_embedings <- as_tibble(h2o.toFrame(w2v.model))
 # # PCA Model gave bad results, it needed many PCs to explain anything meaningful
 
 
-# Tsne Model ####
+# # Tsne Model ####
 # # Model or Load
 # tsne_model <- Rtsne(as.matrix(word_embedings[,2:301]),
 #                     initial_dims = 300,
@@ -185,9 +184,9 @@ word_embedings <- as_tibble(h2o.toFrame(w2v.model))
 #                     max_iter = 20000*2,
 #                     eta = 10)
 # 
-# saveRDS(tsne_model, "saved_data/tsne_model-20190824-a.rds")
+# saveRDS(tsne_model, "saved_data/tsne_model-20191202.rds")
 
-tsne_model <- read_rds("saved_data/tsne_model-20190824-a.rds")
+tsne_model <- read_rds("saved_data/tsne_model-20191202.rds")
 
 
 words <- as.data.frame(word_embedings$Word)

@@ -11,6 +11,7 @@ library(scales)
 library(tidytext)
 library(wordcloud)
 library(ggthemes)
+library(ggTimeSeries)
 
 posts_tbl <- read_rds("saved_data/posts_tbl_topics-20190829.rds")
 topic_labels <- read_rds("saved_data/topic_labels.rds")
@@ -45,13 +46,41 @@ add_topic_labels <- function(posts_tbl, topic_labels) {
 }
 
 posts_tbl %>% 
+  group_by(
+    day_published = as_date(floor_date(first_published_at, "1 day")),
+    topic_label) %>%
+  tally() %>% 
+  mutate(quarter = quarter(day_published)) %>%
+  ggplot(aes(x = day_published, y = n)) +
+  stat_occurrence(show.legend = FALSE) + xlab(NULL) + ylab(NULL) + scale_fill_continuous(low = 'green', high = 'red') + theme( axis.text.y = element_blank(), axis.ticks.y = element_blank(), legend.position = 'none', strip.background = element_blank(), panel.background = element_blank(), panel.border = element_blank(), panel.grid = element_blank(), panel.border = element_blank() )
+
+
+
++
+  scale_y_continuous(breaks = seq(0, 40, by = 2)) +
+  scale_x_date(
+    date_breaks = "1 months",
+    date_labels = "%D") +
+  theme_tufte(ticks = FALSE) +
+  theme(
+    plot.title = element_text(size = 16),
+    plot.subtitle = element_text(size = 13),
+    axis.text = element_text(size = 10),
+    axis.text.x = element_text(angle = 45,
+                               hjust = 1),
+    axis.title = element_text(size = 12),
+    panel.grid.major.x = element_line(linetype = "dotted",
+                                      color = "grey"))
+
+
+posts_tbl %>% 
   # filter(first_published_at <= "2019-08-01") %>%
   group_by(
     day_published = as_date(floor_date(first_published_at, "3 months")),
     topic_label) %>%
   tally() %>% 
-  ggplot(aes(x = day_published, y = n, color = topic_label)) +
-  geom_line(show.legend = FALSE) +
+  ggplot(aes(x = day_published, y = n)) +
+  geom_line(aes(color = topic_label), show.legend = FALSE) +
   facet_wrap(facets = vars(topic_label)) +
   scale_x_date(
     date_breaks = "1 year",

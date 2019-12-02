@@ -13,7 +13,7 @@ library(ggthemes)
 
 # Process Texts ####
 # Load the final output of the 0 - Scrape Medium script 
-posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20190824.rds")
+posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20191201.rds")
 posts_txts <- posts_tbl_processed %>%
   select(id,
          user_id,
@@ -45,10 +45,10 @@ stop_words_total <- unique(c(tm::stopwords('en'),
 #                                 language = "pt",
 #                                 customstopwords = stop_words_total)
 # 
-# write_rds(processed_txts, "saved_data/processed_txts_20190825.rds")
+# write_rds(processed_txts, "saved_data/processed_txts_20191202.rds")
 
-processed_txts <- read_rds("saved_data/processed_txts_20190825.rds")
-# The processing removed 249 texts probably most from not having any Tag (which I'll use for meta)
+processed_txts <- read_rds("saved_data/processed_txts_20191202.rds")
+# The processing removed some texts probably most from not having any Tag (which I'll use for meta)
 # or for having a word count of 19 or less
 
 out <- prepDocuments(processed_txts$documents, 
@@ -74,34 +74,34 @@ meta <- out$meta
 #                      init.type = "Spectral",
 #                      gamma.prior = "L1")
 # 
-# saveRDS(spectral_init, "saved_data/spectral_init_k0_20190825_add_tag1.rds")
+# saveRDS(spectral_init, "saved_data/spectral_init_k0_20191202.rds")
 
-spectral_init <- read_rds("saved_data/spectral_init_k0_20190825_add_tag1.rds")
+spectral_init <- read_rds("saved_data/spectral_init_k0_20191202.rds")
 
 spectral_init
 
-# Spectral Init converged to a 66 topics model suggesting that we will settle on a high number
+# Spectral Init converged to a 57 topics model suggesting that we will settle on a high number
 # That's expected given the diversity of the magazine
 
 # Use Tidy Text Method to model STM with different Ks and choose the best one
 # I'm using STM prevalence parameter with user_id + tag + s(day_published) as meta
-K <- c(5:10, seq(12, 20, 2), seq(24, 48, 4), seq(50, 70, 2))
-# 
-# plan(cluster)
-# 
-# many_models <- data_frame(K = K) %>%
-#   mutate(topic_model = future_map(K,
-#                                   ~stm(documents = docs,
-#                                        vocab = vocab,
-#                                        K = .,
-#                                        prevalence = ~ user_id + tag_1 + s(day_published),
-#                                        data = meta,
-#                                        verbose = TRUE,
-#                                        init.type = "Spectral",
-#                                        gamma.prior = "L1"),
-#                                   .progress = TRUE))
-# 
-# saveRDS(many_models, "saved_data/many_models_20190825_add_tag1.rds")
+K <- c(seq(4, 24, 4), seq(25, 45, 1), seq(46, 70, 4))
+
+plan(cluster)
+
+many_models <- data_frame(K = K) %>%
+  mutate(topic_model = future_map(K,
+                                  ~stm(documents = docs,
+                                       vocab = vocab,
+                                       K = .,
+                                       prevalence = ~ user_id + tag_1 + s(day_published),
+                                       data = meta,
+                                       verbose = TRUE,
+                                       init.type = "Spectral",
+                                       gamma.prior = "L1"),
+                                  .progress = TRUE))
+
+saveRDS(many_models, "saved_data/many_models_20191202.rds")
 
 # Many Models Evaluation ####
 # Search for the good/appropriate/"best" number of topics using Julia Silge's method
