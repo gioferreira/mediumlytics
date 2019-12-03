@@ -85,7 +85,7 @@ spectral_init
 # 
 # # Use Tidy Text Method to model STM with different Ks and choose the best one
 # # I'm using STM prevalence parameter with user_id + tag + s(day_published) as meta
-# K <- c(seq(4, 24, 4), seq(25, 45, 1), seq(46, 70, 4))
+K <- c(seq(4, 24, 4), seq(25, 45, 1), seq(46, 70, 4))
 # 
 # plan(cluster)
 # 
