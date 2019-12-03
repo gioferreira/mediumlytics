@@ -80,32 +80,32 @@ spectral_init <- read_rds("saved_data/spectral_init_k0_20191202.rds")
 
 spectral_init
 
-# Spectral Init converged to a 57 topics model suggesting that we will settle on a high number
-# That's expected given the diversity of the magazine
-
-# Use Tidy Text Method to model STM with different Ks and choose the best one
-# I'm using STM prevalence parameter with user_id + tag + s(day_published) as meta
-K <- c(seq(4, 24, 4), seq(25, 45, 1), seq(46, 70, 4))
-
-plan(cluster)
-
-many_models <- data_frame(K = K) %>%
-  mutate(topic_model = future_map(K,
-                                  ~stm(documents = docs,
-                                       vocab = vocab,
-                                       K = .,
-                                       prevalence = ~ user_id + tag_1 + s(day_published),
-                                       data = meta,
-                                       verbose = TRUE,
-                                       init.type = "Spectral",
-                                       gamma.prior = "L1"),
-                                  .progress = TRUE))
-
-saveRDS(many_models, "saved_data/many_models_20191202.rds")
+# # Spectral Init converged to a 57 topics model suggesting that we will settle on a high number
+# # That's expected given the diversity of the magazine
+# 
+# # Use Tidy Text Method to model STM with different Ks and choose the best one
+# # I'm using STM prevalence parameter with user_id + tag + s(day_published) as meta
+# K <- c(seq(4, 24, 4), seq(25, 45, 1), seq(46, 70, 4))
+# 
+# plan(cluster)
+# 
+# many_models <- data_frame(K = K) %>%
+#   mutate(topic_model = future_map(K,
+#                                   ~stm(documents = docs,
+#                                        vocab = vocab,
+#                                        K = .,
+#                                        prevalence = ~ user_id + tag_1 + s(day_published),
+#                                        data = meta,
+#                                        verbose = TRUE,
+#                                        init.type = "Spectral",
+#                                        gamma.prior = "L1"),
+#                                   .progress = TRUE))
+# 
+# saveRDS(many_models, "saved_data/many_models_20191202.rds")
 
 # Many Models Evaluation ####
 # Search for the good/appropriate/"best" number of topics using Julia Silge's method
-many_models <- readRDS("saved_data/many_models_20190825_add_tag1.rds")
+many_models <- readRDS("saved_data/many_models_20191202.rds")
 
 heldout <- make.heldout(documents = docs,
                         vocab = vocab)
@@ -120,8 +120,9 @@ heldout <- make.heldout(documents = docs,
 #          lbound = bound + lfact,
 #          iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
 # 
-# saveRDS(k_result, "saved_data/k_result_many_models_20190825_add_tag1.rds")
-k_result <- read_rds("saved_data/k_result_many_models_20190825_add_tag1.rds")
+# saveRDS(k_result, "saved_data/k_result_many_models_20191202.rds")
+
+k_result <- read_rds("saved_data/k_result_many_models_20191202.rds")
 
 k_result %>%
   # filter(K !=46,
@@ -145,14 +146,18 @@ k_result %>%
   theme(
     panel.grid.major.x = element_line(
       linetype = "dotted",
-      color = "grey"))
+      color = "grey"),
+    axis.text.x  = element_text(
+      angle = 90,
+      vjust = .5
+    ))
 
-ggsave("plots/many_models_20190825.png",
+ggsave("plots/many_models_20191202.png",
        width = 19.2*1.8,
        height = 10.8*1.8,
        units = "cm")
 
-# Follow up evaluation using many_models_20190826 with 7, 12, 18, 36, 44, 52 ,62 topics. ####
+# Follow up evaluation using many_models_20190826 with 20, 25, 31, 44 topics. ####
 # Based on the semantic coherence, residuals and held-out likelihood I choose the above topics
 # to further investigate using  semantic coherece against exclusivity
 # Acording to Silge, held-out likelihood must be high, residuals low and semantic coherence high
@@ -161,14 +166,12 @@ ggsave("plots/many_models_20190825.png",
 # Having high semantic coherence is relatively easy, though, if you only have a few topics 
 # dominated by very common words, so you want to look at both semantic coherence and exclusivity 
 # of words to topics.
-# and then 7, 18, 36, 44, 52
-# and then 7, 18, 36, 52
-# and then 7, 18, 36
+
 
 k_result %>%
   select(K, exclusivity, semantic_coherence) %>%
-  filter(K %in% c(7, 18, 36)) %>%
-  unnest() %>%
+  filter(K %in% c(20, 25, 31, 44)) %>%
+  unnest(cols = c(exclusivity, semantic_coherence)) %>%
   mutate(K = as.factor(K)) %>%
   ggplot(aes(semantic_coherence, exclusivity, color = K)) +
   geom_point(size = 2, alpha = 0.7) +
@@ -178,26 +181,26 @@ k_result %>%
        title = "Comparing exclusivity and semantic coherence for every topic",
        subtitle = "Models with fewer topics have higher semantic coherence for more topics, but lower exclusivity")
 
-# Extracting topic_models with 7, 18, 36 for an in depth analysis ####
-topic_model_7 <- many_models %>% 
-  filter(K == 7) %>% 
+# Extracting topic_models with 20, 25, 36 for an in depth analysis ####
+topic_model_20 <- many_models %>% 
+  filter(K == 20) %>% 
   pull(topic_model) %>% 
   .[[1]]
 
-topic_model_18 <- many_models %>% 
-  filter(K == 18) %>% 
+topic_model_25 <- many_models %>% 
+  filter(K == 25) %>% 
   pull(topic_model) %>% 
   .[[1]]
 
-topic_model_36 <- many_models %>% 
-  filter(K == 36) %>% 
-  pull(topic_model) %>% 
-  .[[1]]
+# topic_model_36 <- many_models %>% 
+#   filter(K == 36) %>% 
+#   pull(topic_model) %>% 
+#   .[[1]]
 
 
 # Exploring the topic models ####
-# I ran the code below on each one of the 3 models
-topic_model <- topic_model_36
+# I ran the code below on each one of the 2 models
+topic_model <- topic_model_25
 
 td_beta <- tidy(topic_model)
 td_gamma <- tidy(topic_model, matrix = "gamma",
@@ -211,7 +214,7 @@ top_terms <- td_beta %>%
   select(topic, term) %>%
   summarise(terms = list(term)) %>%
   mutate(terms = map(terms, paste, collapse = ", ")) %>% 
-  unnest()
+  unnest(cols = c(terms))
 
 gamma_terms <- td_gamma %>% 
   group_by(topic) %>%
@@ -220,6 +223,7 @@ gamma_terms <- td_gamma %>%
   left_join(top_terms, by = "topic") %>%
   mutate(topic = paste0("Topic ", topic),
          topic = reorder(topic, gamma))
+
 # Kable for plot below
 # gamma_terms %>%
 #   select(topic, gamma, terms) %>%
@@ -280,11 +284,13 @@ ggsave("plots/word_probability_by_topic.png",
        width = 25,
        height = 20,
        units = "cm")
+
 # Labelling Topics in the chosen model ####
-# After settling for the 36 topics model, let's try to label them
-labelTopics(topic_model)
+# After settling for the 25 topics model, let's try to label them
+
+labelTopics(topic_model, n = 10)
 # Using STM findThoughts(to extract IDs of examples of each topic)
-id_list <- findThoughts(model = topic_model_36, texts = as.character(meta$id), n = 5)
+id_list <- findThoughts(model = topic_model, texts = as.character(meta$id), n = 5)
 
 # Check links/slug for example of each topic to help labelling
 
@@ -302,7 +308,7 @@ extract_links <- function(id_list, url_tbl) {
   return(out)
 }
 
-url_tbl <- read_rds("saved_data/url_tbl_20190824.rds")
+url_tbl <- read_rds("saved_data/url_tbl_20191201.rds")
 links <- extract_links(id_list, url_tbl)
 
 # Based on the labelTopics() and on reading a couple of articles from each topic
@@ -310,42 +316,31 @@ links <- extract_links(id_list, url_tbl)
 
 topic_labels <- tribble(
   ~topic, ~label,
-  1, "Gente-Vida-Cotidiano",
-  2, "Cinema-Oscars",
-  3, "Cronica-Sociedade-Comportamento",
-  4, "Relacionamentos-Sentimentos-Babaca-Cansei",
-  5, "Literatura-Ficção-Quadrinhos",
-  6, "Consciência-Espiritualidade-Meditação",
-  7, "Relacionamentos-Amor",
-  8, "Redação-Trendr-New_Order-Letter",
-  9, "Dinheiro-Consumo",
-  10, "Novela-TV",
-  11, "Facebook-Redes_Sociais-Conteúdo-Serviços_Digitais",
-  12, "Política_Nacional-Presidente",
-  13, "Ensino-Educação-Aprendizagem",
-  14, "Religão-Moral-Sociedade-Crenças",
-  15, "Instagram-Redes_Sociais-Internet",
-  16, "Escrita-Texto-Língua_Portuguesa",
-  17, "Rio_de_Janeiro-Polícia-Carnaval-Violência",
-  18, "Sociedade-Capitalismo-Economia-Filosofia",
-  19, "Vida_Adulta-Felicidade-Resiliência-Bolha",
-  20, "Rock-Música-Rap",
-  21, "Séries",
-  22, "Design-Arte-Publicidade-Mmouranet",
-  23, "New_Order-Cassio-Temporadas-Diversidade-Cultura",
-  24, "Rapidinhas-Tecnologia",
-  25, "Fake_News-Informação-Notícia",
-  26, "Vida-Universo-Morte-Estrelas-Céu",
-  27, "Dor_Emocional-Depressão-Ansiedade-Dor",
-  28, "Emprego-Trabalho-Refroma_da_Previdência-Empresa",
-  29, "Arte-Cultura-Museus-Espaços_Culturais",
-  30, "Casa-Família-Mãe-Pai-Filhos",
-  31, "Violência-Homem-Mulher-Estupro-Corpo",
-  32, "Democracia-Política-Corrupção",
-  33, "Genêro-Feminismo-Gay-Lésbica-Machismo",
-  34, "Ciência-Tecnologia-Nasa-Pesquisa",
-  35, "Filme-Heróis-Batman-Marvel-Franquias",
-  36, "Futebol-Atletas-Esporte-Time"
+  1, "Gente-Vida-Vontades",
+  2, "Filme-Cinema",
+  3, "Saude_Mental-Ansiedade-Meditação",
+  4, "Literatura-Filosofia-Ficção",
+  5, "Pessoa-Empatia-Mágoas",
+  6, "Felicidade-Espiritualidade",
+  7, "Ciência-Universo-Espaço",
+  8, "Amor-Saudade-Dor",
+  9, "Novela-TV-Globo-Séries",
+  10, "Mulher-Violência-Feminismo",
+  11, "Política-Brasil-Impeachment",
+  12, "Rapidinhas-Tecnologia",
+  13, "Futebol-Uber-Dinheiro",
+  14, "Sociedade-Violencia-Homofobia-Racismo",
+  15, "Fake_News-Informação-Notícia",
+  16, "Sociedade-Subjetividade-Vínculos-Indivíduo",
+  17, "Amor-Relacionamento-Afeto-Sexo",
+  18, "Escrever-Escrita-Linguística",
+  19, "Internet-Redes_Sociais-Facebook-Instagram",
+  20, "Cidades-Casa-Veias-Rio-São_Paulo",
+  21, "New_Order-Cassio-Revista-News_Letter",
+  22, "Música-Artistas-Banda-Cultura",
+  23, "Vida-Ensino-Pais-Professores",
+  24, "Design-Publicidade-Moda-Mercado",
+  25, "Mundo-Política"
 ) %>% 
   mutate(label = as_factor(label))
 
@@ -433,7 +428,7 @@ posts_tbl_topics <- posts_tbl_processed %>%
 
 
 
-write_rds(posts_tbl_topics, "saved_data/posts_tbl_topics-20190829.rds")
+write_rds(posts_tbl_topics, "saved_data/posts_tbl_topics-20191202.rds")
   
 
   
