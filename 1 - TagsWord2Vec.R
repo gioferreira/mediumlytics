@@ -26,7 +26,7 @@ palette <- c("#E5164B", "#39B24B", "#D3B60D", "#4363D7", "#F38131", "#901DB3", "
 posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20191201.rds")
 
 # # Sanity Check
-# posts_tbl_processed %>% skim()
+posts_tbl_processed %>% skim()
 
 
 # WordCloud & Rank ####
