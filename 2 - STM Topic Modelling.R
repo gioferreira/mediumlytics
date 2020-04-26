@@ -13,7 +13,11 @@ library(ggthemes)
 
 # Process Texts ####
 # Load the final output of the 0 - Scrape Medium script 
-posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20191201.rds")
+posts_tbl_processed_path <- paste0("saved_data/posts_tbl_processed_",
+                                   gsub("-", "", today()),
+                                   ".rds")
+posts_tbl_processed <- read_rds(posts_tbl_processed_path)
+
 posts_txts <- posts_tbl_processed %>%
   select(id,
          user_id,
@@ -37,17 +41,23 @@ stop_words_total <- unique(c(tm::stopwords('en'),
                              tm::stopwords('pt'),
                              stop_words))
 
-# # Process Texts or Load Pre Processed
-# processed_txts <- textProcessor(posts_txts$text,
-#                                 metadata = posts_txts,
-#                                 removestopwords = FALSE,
-#                                 stem = FALSE,
-#                                 language = "pt",
-#                                 customstopwords = stop_words_total)
-# 
-# write_rds(processed_txts, "saved_data/processed_txts_20191202.rds")
+# Process Texts or Load Pre Processed
+processed_txts_path <- paste0("saved_data/processed_txts_",
+                              gsub("-", "", today()),
+                              ".rds")
+if (!file.exists(processed_txts_path)) {
+  processed_txts <- textProcessor(posts_txts$text,
+                                  metadata = posts_txts,
+                                  removestopwords = FALSE,
+                                  stem = FALSE,
+                                  language = "pt",
+                                  customstopwords = stop_words_total)
+  
+  write_rds(processed_txts, processed_txts_path)
+} else {
+  processed_txts <- read_rds(processed_txts_path)  
+}
 
-processed_txts <- read_rds("saved_data/processed_txts_20191202.rds")
 # The processing removed some texts probably most from not having any Tag (which I'll use for meta)
 # or for having a word count of 19 or less
 
@@ -62,21 +72,24 @@ docs <- out$documents
 vocab <- out$vocab
 meta <- out$meta
 
-
-
 # Search for the Ideal K ####
-# # Use spectral init with k = 0 to search for the ideal K
-# spectral_init <- stm(documents = docs,
-#                      vocab = vocab,
-#                      K = 0,
-#                      prevalence = ~ user_id + tag_1 + s(day_published),
-#                      data = meta,
-#                      init.type = "Spectral",
-#                      gamma.prior = "L1")
-# 
-# saveRDS(spectral_init, "saved_data/spectral_init_k0_20191202.rds")
-
-spectral_init <- read_rds("saved_data/spectral_init_k0_20191202.rds")
+# Use spectral init with k = 0 to search for the ideal K
+spectral_init_path <- paste0("saved_data/spectral_init_k0_",
+                             gsub("-", "", today()),
+                             ".rds")
+if (!file.exists(spectral_init_path)) {
+  spectral_init <- stm(documents = docs,
+                       vocab = vocab,
+                       K = 0,
+                       prevalence = ~ user_id + tag_1 + s(day_published),
+                       data = meta,
+                       init.type = "Spectral",
+                       gamma.prior = "L1")
+  
+  saveRDS(spectral_init, spectral_init_path)
+} else {
+  spectral_init <- read_rds(spectral_init_path)  
+}
 
 spectral_init
 
