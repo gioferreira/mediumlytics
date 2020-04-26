@@ -2,9 +2,7 @@
 # Word2Vec Tags
 
 # Loading Thigs ####
-
 source('src/utils/utils.R')
-
 library(magrittr)
 library(tidyverse)
 # devtools::install_github("elbersb/tidylog")
@@ -14,53 +12,67 @@ library(ggthemes)
 library(lubridate)
 library(scales)
 library(tidytext)
-library(wordcloud)
 library(h2o)
 library(Rtsne)
 library(dbscan)
+library(ggwordcloud)
+library(RColorBrewer)
 
 # palette <- c("#a0e85b", "#d725a3", "#36e515", "#7f2157", "#7ee8c0", "#fe1d66", "#5c922f", "#7835d3", "#e9d737", "#1c4bb4", "#f39450", "#154e56", "#e4ccf1", "#76480d", "#48b6ea", "#ae3028", "#fd92fa", "#115205", "#628df2", "#dbc58e", "#FFe85b", "#aFeFFb")
 
 palette <- c("#E5164B", "#39B24B", "#D3B60D", "#4363D7", "#F38131", "#901DB3", "#40D3F4", "#EF32E4", "#8CAF1E", "#F29999", "#46978E", "#E995F4", "#9A6325", "#CCC27F", "#7F0100", "#77E894", "#808000", "#EA5F34", "#000175", "#089CA3", "#78768E", "#A5A49B", "#2B0202", "#615263", "#0F122D")
 
-posts_tbl_processed <- read_rds("saved_data/posts_tbl_processed_20191201.rds")
+posts_tbl_processed_path <-
+  paste0("saved_data/posts_tbl_processed_",
+         gsub("-", "", today()),
+         ".rds")
+
+posts_tbl_processed <- read_rds(posts_tbl_processed_path)
 
 # # Sanity Check
 posts_tbl_processed %>% skim()
 
 
 # WordCloud & Rank ####
+colors <- brewer.pal(9, "Greys")[5:8]
 
-set.seed(1234)
-
-posts_tbl_processed %>%
+set.seed(80)
+word_cloud_data <- posts_tbl_processed %>%
   select(num_range("tag_", 1:5)) %>%
+  mutate_if(is.factor, as.character) %>%
   gather() %>%
   select(value) %>%
   rename(word = value) %>%
   count(word, sort = TRUE) %>%
   filter(!is.na(word),
          word != "") %>%
-  with(wordcloud(word, 
-                 n, 
-                 scale = c(5.25*.7, .55),
-                 random.order = FALSE, 
-                 max.words = 50, 
-                 colors = (brewer.pal(10, "Greys")[5:8]),
-                 rot.per = .25,
-                 use.r.layout = FALSE
-  ))
-# I don't know how to save an output from wordcloud, I used RStudio Interface
+  top_n(50, n) %>%
+  mutate(angle = 90 * sample(c(0, 1), n(), replace = TRUE, prob = c(75, 25)))
+  # mutate(angle = 45 * sample(-2:2, n(), replace = TRUE, prob = c(1, 1, 4, 1, 1)))
 
-posts_tbl_processed %>%
-  select(num_range("tag_", 1:5)) %>%
-  gather() %>%
-  select(value) %>%
-  rename(word = value) %>%
-  count(word, sort = TRUE) %>%
-  filter(!is.na(word),
-         word != "") %>%
-  top_n(50, wt = n) %>%
+word_cloud_data %>%
+  ggplot(aes(label = word, 
+             size = n,
+             angle = angle,
+             color = cut_number(n, 4))) +
+  geom_text_wordcloud_area(area_corr_power = 1/.75,
+                           eccentricity = .8,
+                           grid_margin = 1,
+                           show_boxes = FALSE,
+                           seed = 1234,
+                           family = "sans") +
+  scale_size_area(max_size = 20) +
+  scale_color_manual(values = colors) +
+  theme_minimal()
+  
+ggsave("plots/09-wordcloud.png",
+       width = 21,
+       height = 14.85,
+       units = "cm",
+       dpi = 300)
+  
+
+word_cloud_data %>%
   ggplot(aes(x = reorder(word, n, sum), y = n)) +
   geom_col() +
   coord_flip() +
@@ -116,18 +128,19 @@ tokenize <- function(sentences) {
 
 words <- h2o.na_omit(tokenize(tags$tags))
 
-# # Model or Load Model
-# 
-# w2v.model <- h2o.word2vec(words, vec_size = 300, window_size = 3, epochs = 10000)
-# model_path <- h2o.saveModel(object = w2v.model, path = "saved_data", force = TRUE)
+# Model or Load Model
+w2v.model <- h2o.word2vec(words, vec_size = 300, window_size = 3, epochs = 10000)
+model_path <- h2o.saveModel(object = w2v.model, path = "saved_data", force = TRUE)
 
-load_model_path <- "saved_data/Word2Vec_model_R_1575286786258_1"
+load_model_path <- "saved_data/Word2Vec_model_R_1587939172571_1"
 w2v.model <- h2o.loadModel(path = load_model_path)
 
 # Sanity Check
 print(h2o.findSynonyms(w2v.model, "rapidinhas", count = 10))
 
 word_embedings <- as_tibble(h2o.toFrame(w2v.model))
+
+h2o.shutdown()
 
 
 # PCA Model ####
@@ -176,29 +189,25 @@ word_embedings <- as_tibble(h2o.toFrame(w2v.model))
 
 
 # # Tsne Model ####
-# # Model or Load
-# tsne_model <- Rtsne(as.matrix(word_embedings[,2:301]),
-#                     initial_dims = 300,
-#                     perplexity = 22,
-#                     theta = .05,
-#                     max_iter = 20000*2,
-#                     eta = 10)
-# 
-# saveRDS(tsne_model, "saved_data/tsne_model-20191202.rds")
-
-tsne_model <- read_rds("saved_data/tsne_model-20191202.rds")
-
+tsne_model_path <- posts_tbl_path <- paste0("saved_data/tsne_model_",
+                                            gsub("-", "", today()),
+                                            ".rds")
+if (!file.exists(tsne_model_path)) {
+  tsne_model <- Rtsne(as.matrix(word_embedings[,2:301]),
+                      initial_dims = 300,
+                      perplexity = 22,
+                      theta = .05,
+                      max_iter = 20000*2,
+                      eta = 10)
+  saveRDS(tsne_model, tsne_model_path)
+} else {
+  tsne_model <- read_rds(tsne_model_path)  
+}
 
 words <- as.data.frame(word_embedings$Word)
 tsne_result <- as.data.frame(tsne_model$Y)
 words_tsne <- bind_cols(words, tsne_result)  
 names(words_tsne) <- c("Word", "X", "Y")
-
-# # Cluster with hdbscan
-# clusters <- hdbscan(tsne_result, 
-#                     minPts = 5)
-# 
-# words_tsne$clhdb <- clusters$cluster
 
 # Cluster with hclust
 clusters <-  hclust(dist(scale(tsne_result)),
@@ -264,8 +273,14 @@ words_tsne %>%
         panel.background = element_rect(fill = "black", color = "white")) +
   scale_color_manual(values = palette)
 
-# Rank per Group ####
+ggsave("plots/cover.png",
+       width = 19.2,
+       height = 10.8,
+       units = "cm",
+       dpi = 300)
 
+
+# Rank per Group ####
 rank_per_group <- words_tsne %>%
   left_join(posts_tbl_processed %>% # Get Count
               select(num_range("tag_", 1:5)) %>%
