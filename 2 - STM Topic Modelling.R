@@ -93,32 +93,38 @@ if (!file.exists(spectral_init_path)) {
 
 spectral_init
 
-# # Spectral Init converged to a 57 topics model suggesting that we will settle on a high number
+# # Spectral Init converged to a 65 topics model suggesting that we will settle on a high number
 # # That's expected given the diversity of the magazine
 # 
 # # Use Tidy Text Method to model STM with different Ks and choose the best one
 # # I'm using STM prevalence parameter with user_id + tag + s(day_published) as meta
-K <- c(seq(4, 24, 4), seq(25, 45, 1), seq(46, 70, 4))
-# 
-# plan(cluster)
-# 
-# many_models <- data_frame(K = K) %>%
-#   mutate(topic_model = future_map(K,
-#                                   ~stm(documents = docs,
-#                                        vocab = vocab,
-#                                        K = .,
-#                                        prevalence = ~ user_id + tag_1 + s(day_published),
-#                                        data = meta,
-#                                        verbose = TRUE,
-#                                        init.type = "Spectral",
-#                                        gamma.prior = "L1"),
-#                                   .progress = TRUE))
-# 
-# saveRDS(many_models, "saved_data/many_models_20191202.rds")
+K <- c(seq(4, 20, 4), seq(20, 45, 1), seq(46, 82, 4))
+
+tic()
+plan(cluster)
+many_models <- data_frame(K = K) %>%
+  mutate(topic_model = future_map(K,
+                                  ~stm(documents = docs,
+                                       vocab = vocab,
+                                       K = .,
+                                       prevalence = ~ user_id + tag_1 + s(day_published),
+                                       data = meta,
+                                       verbose = TRUE,
+                                       init.type = "Spectral",
+                                       gamma.prior = "L1"),
+                                  .progress = TRUE))
+
+many_models_path <- paste0("saved_data/many_models_",
+                           gsub("-", "", today()),
+                           ".rds")
+saveRDS(many_models, many_models_path)
+system("say Just finished!")
+print(paste("Saved to:", many_models_path))
+toc()
 
 # Many Models Evaluation ####
 # Search for the good/appropriate/"best" number of topics using Julia Silge's method
-many_models <- readRDS("saved_data/many_models_20191202.rds")
+many_models <- readRDS(many_models_path)
 
 heldout <- make.heldout(documents = docs,
                         vocab = vocab)
