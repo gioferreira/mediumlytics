@@ -6,6 +6,7 @@ library(data.tree)
 library(tokenizers)
 library(doParallel)
 library(lubridate)
+library(furrr)
 
 make_first_req <- function(starting_url,
                            limit = 50){
@@ -297,16 +298,6 @@ process_json_list <- function(json_list){
   return(posts_tbl)
 }
 
-# par_process_json_list <- function(json_list){
-#   no_cores <- detectCores() - 1
-#   registerDoParallel(cores = no_cores)
-#   cl <- makeCluster(no_cores)
-#   clusterExport(cl=cl, varlist=c("remove_empty", "process_json_list", "tidyverse"))
-#   posts_tbl <- parLapply(cl, json_list, process_json)
-#   stopCluster(cl)
-#   return(posts_tbl)
-# }
-
 par_process_json_list <- function(json_list){
   no_cores <- detectCores() - 1
   registerDoParallel(cores = no_cores)
@@ -319,23 +310,11 @@ par_process_json_list <- function(json_list){
   return(posts_tbl)
 }
 
-
-
-# cl <- makeCluster(2)
-# registerDoParallel(cl)
-# system.time(foreach(i=1:10000) %dopar% sum(tanh(1:i)))
-# stopCluster(cl)
-
-
-
-# 
-#json_list_element <- json_list[[32]] #(com zero length problem)
-# n2 <- json_list_element$payload$value$content$bodyModel$paragraphs[[35]] #paragrafo especifico com zero length
-# n2[[4]]
-# n2b <- clean_json$payload$value$content$bodyModel$paragraphs[[35]]
-# n2b$markups[[4]]
-# json_list_element <- json_list[[1]]
-# 
-
-
-
+furrr_process_json_list <- function(json_list){
+  plan(multiprocess)
+  
+  posts_tbl <- future_map(json_list, process_json, .progress = TRUE)
+  
+  return(posts_tbl)
+  
+}
