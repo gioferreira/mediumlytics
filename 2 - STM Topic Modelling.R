@@ -45,6 +45,7 @@ stop_words_total <- unique(c(tm::stopwords('en'),
 processed_txts_path <- paste0("saved_data/processed_txts_",
                               gsub("-", "", today()),
                               ".rds")
+
 if (!file.exists(processed_txts_path)) {
   processed_txts <- textProcessor(posts_txts$text,
                                   metadata = posts_txts,
@@ -93,60 +94,64 @@ if (!file.exists(spectral_init_path)) {
 
 spectral_init
 
-# # Spectral Init converged to a 65 topics model suggesting that we will settle on a high number
-# # That's expected given the diversity of the magazine
-# 
-# # Use Tidy Text Method to model STM with different Ks and choose the best one
-# # I'm using STM prevalence parameter with user_id + tag + s(day_published) as meta
-K <- c(seq(4, 20, 4), seq(20, 45, 1), seq(46, 82, 4))
+# Spectral Init converged to a 65 topics model suggesting that we will settle on a high number
+# That's expected given the diversity of the magazine
 
-tic()
-plan(cluster)
-many_models <- data_frame(K = K) %>%
-  mutate(topic_model = future_map(K,
-                                  ~stm(documents = docs,
-                                       vocab = vocab,
-                                       K = .,
-                                       prevalence = ~ user_id + tag_1 + s(day_published),
-                                       data = meta,
-                                       verbose = TRUE,
-                                       init.type = "Spectral",
-                                       gamma.prior = "L1"),
-                                  .progress = TRUE))
-
+# Many Models method from Tidy Text ####
+# Use Tidy Text Method to model STM with different Ks and choose the best one
+# I'm using STM prevalence parameter with user_id + tag + s(day_published) as meta
 many_models_path <- paste0("saved_data/many_models_",
                            gsub("-", "", today()),
                            ".rds")
-saveRDS(many_models, many_models_path)
-system("say Just finished!")
-print(paste("Saved to:", many_models_path))
-toc()
+
+if (!file.exists(many_models_path)) {
+  K <- c(seq(4, 20, 4), seq(20, 45, 1), seq(46, 82, 4))
+  
+  plan(cluster)
+  many_models <- data_frame(K = K) %>%
+    mutate(topic_model = future_map(K,
+                                    ~stm(documents = docs,
+                                         vocab = vocab,
+                                         K = .,
+                                         prevalence = ~ user_id + tag_1 + s(day_published),
+                                         data = meta,
+                                         verbose = TRUE,
+                                         init.type = "Spectral",
+                                         gamma.prior = "L1"),
+                                    .progress = TRUE))
+  
+  
+  saveRDS(many_models, many_models_path)
+} else {
+  many_models <- readRDS(many_models_path)  
+}
 
 # Many Models Evaluation ####
 # Search for the good/appropriate/"best" number of topics using Julia Silge's method
-many_models <- readRDS(many_models_path)
-
 heldout <- make.heldout(documents = docs,
                         vocab = vocab)
 
-# k_result <- many_models %>%
-#   mutate(exclusivity = map(topic_model, exclusivity),
-#          semantic_coherence = map(topic_model, semanticCoherence, docs),
-#          eval_heldout = map(topic_model, eval.heldout, heldout$missing),
-#          residual = map(topic_model, checkResiduals, docs),
-#          bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),
-#          lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),
-#          lbound = bound + lfact,
-#          iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
-# 
-# saveRDS(k_result, "saved_data/k_result_many_models_20191202.rds")
+k_result_path <- paste0("saved_data/k_result_many_models_",
+                        gsub("-", "", today()),
+                        ".rds")
 
-k_result <- read_rds("saved_data/k_result_many_models_20191202.rds")
+if (!file.exists(k_result_path)) {
+  k_result <- many_models %>%
+    mutate(exclusivity = map(topic_model, exclusivity),
+           semantic_coherence = map(topic_model, semanticCoherence, docs),
+           eval_heldout = map(topic_model, eval.heldout, heldout$missing),
+           residual = map(topic_model, checkResiduals, docs),
+           bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),
+           lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),
+           lbound = bound + lfact,
+           iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
+  
+  saveRDS(k_result, k_result_path)  
+} else {
+  k_result <- read_rds(k_result_path)  
+}
 
 k_result %>%
-  # filter(K !=46,
-  #        K != 66,
-  #        K != 72) %>%
   transmute(K,
             `Lower bound` = lbound,
             Residuals = map_dbl(residual, "dispersion"),
@@ -171,12 +176,16 @@ k_result %>%
       vjust = .5
     ))
 
-ggsave("plots/many_models_20191202.png",
-       width = 19.2*1.8,
-       height = 10.8*1.8,
+many_models_plot <- paste0("plots/many_models_",
+                           gsub("-", "", today()),
+                           ".png")
+
+ggsave(many_models_plot,
+       width = 29,
+       height = 21,
        units = "cm")
 
-# Follow up evaluation using many_models_20190826 with 20, 25, 31, 44 topics. ####
+# Follow up evaluation using many_models_20200427 with 21, 23, 32, 43, 66 topics. ####
 # Based on the semantic coherence, residuals and held-out likelihood I choose the above topics
 # to further investigate using  semantic coherece against exclusivity
 # Acording to Silge, held-out likelihood must be high, residuals low and semantic coherence high
@@ -189,7 +198,7 @@ ggsave("plots/many_models_20191202.png",
 
 k_result %>%
   select(K, exclusivity, semantic_coherence) %>%
-  filter(K %in% c(20, 25, 31, 44)) %>%
+  filter(K %in% c(4, 21, 23, 32, 43, 66)) %>%
   unnest(cols = c(exclusivity, semantic_coherence)) %>%
   mutate(K = as.factor(K)) %>%
   ggplot(aes(semantic_coherence, exclusivity, color = K)) +
@@ -201,25 +210,25 @@ k_result %>%
        subtitle = "Models with fewer topics have higher semantic coherence for more topics, but lower exclusivity")
 
 # Extracting topic_models with 20, 25, 36 for an in depth analysis ####
-topic_model_20 <- many_models %>% 
-  filter(K == 20) %>% 
+topic_model_21 <- many_models %>% 
+  filter(K == 21) %>% 
   pull(topic_model) %>% 
   .[[1]]
 
-topic_model_25 <- many_models %>% 
-  filter(K == 25) %>% 
+topic_model_23 <- many_models %>% 
+  filter(K == 23) %>% 
   pull(topic_model) %>% 
   .[[1]]
 
-# topic_model_36 <- many_models %>% 
-#   filter(K == 36) %>% 
-#   pull(topic_model) %>% 
-#   .[[1]]
+topic_model_33 <- many_models %>%
+  filter(K == 33) %>%
+  pull(topic_model) %>%
+  .[[1]]
 
 
 # Exploring the topic models ####
 # I ran the code below on each one of the 2 models
-topic_model <- topic_model_25
+topic_model <- topic_model_23
 
 td_beta <- tidy(topic_model)
 td_gamma <- tidy(topic_model, matrix = "gamma",
@@ -250,13 +259,12 @@ gamma_terms <- td_gamma %>%
 #         col.names = c("Topic", "Expected topic proportion", "Top 7 terms"))
 
 gamma_terms %>%
-  # top_n(20, gamma) %>%
   ggplot(aes(topic, gamma, label = terms, fill = topic)) +
   geom_col(show.legend = FALSE) +
   geom_text(hjust = 0, nudge_y = 0.0005, size = 3.2, color = rgb(.3, .3, .3)) +
   coord_flip() +
   scale_y_continuous(expand = c(0,0),
-                     limits = c(0, 0.095),
+                     limits = c(0, 0.13),
                      labels = percent_format()) +
   theme_tufte(ticks = FALSE) +
   theme(plot.title = element_text(size = 16),
@@ -265,9 +273,9 @@ gamma_terms %>%
        title = "Topics by prevalence in the New Order corpus",
        subtitle = "With the top words that contribute to each topic")
 
-ggsave("plots/topics_by_prevalence.png",
-       width = 19.2*1.8,
-       height = 10.8*1.8,
+ggsave("plots/topics_by_prevalence 33 topics.png",
+       width = 29,
+       height = 21,
        units = "cm")
 
 td_beta_plot <- td_beta %>%
@@ -296,23 +304,22 @@ td_beta_plot %>%
           linetype = "dotted",
           color = "grey")) +
   labs(x = NULL, y = expression(beta),
-       title = "Highest word probabilities for each topic for 36 topics model",
+       title = "Highest word probabilities for each topic",
        subtitle = "Different words are associated with different topics")
 
-ggsave("plots/word_probability_by_topic.png",
-       width = 25,
-       height = 20,
+ggsave("plots/word_probability_by_topic 23 topics.png",
+       width = 29,
+       height = 21,
        units = "cm")
 
 # Labelling Topics in the chosen model ####
 # After settling for the 25 topics model, let's try to label them
 
-labelTopics(topic_model, n = 10)
+labels <- labelTopics(topic_model, n = 10)
 # Using STM findThoughts(to extract IDs of examples of each topic)
 id_list <- findThoughts(model = topic_model, texts = as.character(meta$id), n = 5)
 
 # Check links/slug for example of each topic to help labelling
-
 # Given an URL TBL (generated on the Scrape Medium Script and a "id_list" outputed from 
 # findThoughs() the function below recover the links)
 extract_links <- function(id_list, url_tbl) {
@@ -358,8 +365,6 @@ topic_labels <- tribble(
   21, "New_Order-Cassio-Revista-News_Letter",
   22, "Música-Artistas-Banda-Cultura",
   23, "Vida-Ensino-Pais-Professores",
-  24, "Design-Publicidade-Moda-Mercado",
-  25, "Mundo-Política"
 ) %>% 
   mutate(label = as_factor(label))
 
@@ -448,9 +453,9 @@ posts_tbl_topics <- posts_tbl_processed %>%
 
 
 write_rds(posts_tbl_topics, "saved_data/posts_tbl_topics-20191202.rds")
-  
 
-  
+
+
 # References ####  
 # Comment on this: https://github.com/bstewart/stm/issues/152
 # read: http://www.periodicos.letras.ufmg.br/index.php/relin/article/view/8916/8803
