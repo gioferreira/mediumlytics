@@ -107,7 +107,8 @@ many_models_path <- paste0("saved_data/many_models_",
 if (!file.exists(many_models_path)) {
   K <- c(seq(4, 20, 4), seq(20, 45, 1), seq(46, 82, 4))
   
-  plan(cluster)
+  no_cores <- availableCores() - 1
+  plan("multiprocess", workers = no_cores)
   many_models <- data_frame(K = K) %>%
     mutate(topic_model = future_map(K,
                                     ~stm(documents = docs,
