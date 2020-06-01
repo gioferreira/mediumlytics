@@ -25,7 +25,7 @@ if (!file.exists(url_tbl_path)) {
 }
 
 # Download missing jsons to folder "jsons" ####
-# Last Download 2020 04 26
+# Last Download 2020 05 31
 # I used only the id + scrapeurl for the download json URL
 # But I could use the real url with this "remove accents" line:
 # gsub("(`|\\'|~|\\^)", "",iconv(url_tbl$url[[i]], to="ASCII//TRANSLIT"))
