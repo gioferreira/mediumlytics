@@ -94,7 +94,7 @@ if (!file.exists(spectral_init_path)) {
 
 spectral_init
 
-# Spectral Init converged to a 65 topics model suggesting that we will settle on a high number
+# Spectral Init converged to a 62 topics model suggesting that we will settle on a high number
 # That's expected given the diversity of the magazine
 
 # Many Models method from Tidy Text ####
