@@ -105,7 +105,7 @@ many_models_path <- paste0("saved_data/many_models_",
                            ".rds")
 
 if (!file.exists(many_models_path)) {
-  K <- c(seq(4, 20, 4), seq(20, 45, 1), seq(46, 82, 4))
+  K <- c(seq(4, 16, 4), seq(20, 45, 1), seq(46, 82, 4))
   
   no_cores <- availableCores() - 1
   plan("multiprocess", workers = no_cores)
@@ -152,7 +152,7 @@ if (!file.exists(k_result_path)) {
   k_result <- read_rds(k_result_path)  
 }
 
-k_result %>%
+many_models_plot <- k_result %>%
   transmute(K,
             `Lower bound` = lbound,
             Residuals = map_dbl(residual, "dispersion"),
@@ -177,16 +177,18 @@ k_result %>%
       vjust = .5
     ))
 
-many_models_plot <- paste0("plots/many_models_",
+many_models_plot_path <- paste0("plots/many_models_",
                            gsub("-", "", today()),
                            ".png")
 
-ggsave(many_models_plot,
+ggsave(many_models_plot_path,
+       plot = many_models_plot,
        width = 29,
        height = 21,
-       units = "cm")
+       units = "cm",
+       scale = 1.5)
 
-# Follow up evaluation using many_models_20200427 with 21, 23, 32, 43, 66 topics. ####
+# Follow up evaluation using many_models_20200427 with 12, 24, 31, 35 topics. ####
 # Based on the semantic coherence, residuals and held-out likelihood I choose the above topics
 # to further investigate using  semantic coherece against exclusivity
 # Acording to Silge, held-out likelihood must be high, residuals low and semantic coherence high
@@ -199,7 +201,7 @@ ggsave(many_models_plot,
 
 k_result %>%
   select(K, exclusivity, semantic_coherence) %>%
-  filter(K %in% c(4, 21, 23, 32, 43, 66)) %>%
+  filter(K %in% c(12, 24, 31, 35)) %>%
   unnest(cols = c(exclusivity, semantic_coherence)) %>%
   mutate(K = as.factor(K)) %>%
   ggplot(aes(semantic_coherence, exclusivity, color = K)) +
@@ -210,26 +212,20 @@ k_result %>%
        title = "Comparing exclusivity and semantic coherence for every topic",
        subtitle = "Models with fewer topics have higher semantic coherence for more topics, but lower exclusivity")
 
-# Extracting topic_models with 20, 25, 36 for an in depth analysis ####
-topic_model_21 <- many_models %>% 
-  filter(K == 21) %>% 
+# Extracting topic_models with 12, 24 for an in depth analysis ####
+topic_model_12 <- many_models %>% 
+  filter(K == 12) %>% 
   pull(topic_model) %>% 
   .[[1]]
 
-topic_model_23 <- many_models %>% 
-  filter(K == 23) %>% 
+topic_model_24 <- many_models %>% 
+  filter(K == 24) %>% 
   pull(topic_model) %>% 
   .[[1]]
-
-topic_model_33 <- many_models %>%
-  filter(K == 33) %>%
-  pull(topic_model) %>%
-  .[[1]]
-
 
 # Exploring the topic models ####
 # I ran the code below on each one of the 2 models
-topic_model <- topic_model_23
+topic_model <- topic_model_24
 
 td_beta <- tidy(topic_model)
 td_gamma <- tidy(topic_model, matrix = "gamma",
@@ -265,16 +261,16 @@ gamma_terms %>%
   geom_text(hjust = 0, nudge_y = 0.0005, size = 3.2, color = rgb(.3, .3, .3)) +
   coord_flip() +
   scale_y_continuous(expand = c(0,0),
-                     limits = c(0, 0.13),
+                     limits = c(0, 0.11),
                      labels = percent_format()) +
   theme_tufte(ticks = FALSE) +
   theme(plot.title = element_text(size = 16),
         plot.subtitle = element_text(size = 13)) +
   labs(x = NULL, y = expression(gamma),
-       title = "Topics by prevalence in the New Order corpus",
-       subtitle = "With the top words that contribute to each topic")
+       title = "Tópicos por prevalência no conjunto de textos da New Order",
+       subtitle = "Com as palavras que mais contribuem para cada tópico")
 
-ggsave("plots/topics_by_prevalence 33 topics.png",
+ggsave("plots/09-topics_by_prevalence.png",
        width = 29,
        height = 21,
        units = "cm")
@@ -289,7 +285,7 @@ td_beta_plot <- td_beta %>%
 td_beta_plot %>% 
   ggplot(aes(order, beta, fill = as.factor(topic))) +
   geom_col(alpha = 0.8, show.legend = FALSE) +
-  facet_wrap(~ topic, scales = "free_y") +
+  facet_wrap(~ topic, ncol = 4, scales = "free_y") +
   scale_x_continuous(breaks = td_beta_plot$order,
                      labels = td_beta_plot$term,
                      expand = c(0,0)) +
@@ -305,10 +301,10 @@ td_beta_plot %>%
           linetype = "dotted",
           color = "grey")) +
   labs(x = NULL, y = expression(beta),
-       title = "Highest word probabilities for each topic",
-       subtitle = "Different words are associated with different topics")
+       title = "Palavras com maior probabilidade de aparecer em cada tópico")
+       # subtitle = "Different words are associated with different topics")
 
-ggsave("plots/word_probability_by_topic 23 topics.png",
+ggsave("plots/10-word_probability_by_topic 24 topics.png",
        width = 29,
        height = 21,
        units = "cm")
@@ -335,7 +331,7 @@ extract_links <- function(id_list, url_tbl) {
   return(out)
 }
 
-url_tbl <- read_rds("saved_data/url_tbl_20191201.rds")
+url_tbl <- read_rds("saved_data/url_tbl_20200531.rds")
 links <- extract_links(id_list, url_tbl)
 
 # Based on the labelTopics() and on reading a couple of articles from each topic
@@ -343,33 +339,34 @@ links <- extract_links(id_list, url_tbl)
 
 topic_labels <- tribble(
   ~topic, ~label,
-  1, "Gente-Vida-Vontades",
+  1, "Gente-Vida-Cotidiano",
   2, "Filme-Cinema",
-  3, "Saude_Mental-Ansiedade-Meditação",
-  4, "Literatura-Filosofia-Ficção",
-  5, "Pessoa-Empatia-Mágoas",
-  6, "Felicidade-Espiritualidade",
-  7, "Ciência-Universo-Espaço",
-  8, "Amor-Saudade-Dor",
-  9, "Novela-TV-Globo-Séries",
-  10, "Mulher-Violência-Feminismo",
-  11, "Política-Brasil-Impeachment",
-  12, "Rapidinhas-Tecnologia",
-  13, "Futebol-Uber-Dinheiro",
-  14, "Sociedade-Violencia-Homofobia-Racismo",
-  15, "Fake_News-Informação-Notícia",
-  16, "Sociedade-Subjetividade-Vínculos-Indivíduo",
-  17, "Amor-Relacionamento-Afeto-Sexo",
-  18, "Escrever-Escrita-Linguística",
-  19, "Internet-Redes_Sociais-Facebook-Instagram",
-  20, "Cidades-Casa-Veias-Rio-São_Paulo",
-  21, "New_Order-Cassio-Revista-News_Letter",
-  22, "Música-Artistas-Banda-Cultura",
-  23, "Vida-Ensino-Pais-Professores",
+  3, "Saude_Mental-Ansiedade-Yoga-Psiquiatra",
+  4, "Literatura-Filosofia-Ficção-Quadrinhos",
+  5, "Pessoa-Opinião-Empatia",
+  6, "Universo-Vida-Ciência-Religião",
+  7, "Felicidade-Meditação-Emoções-Bem_Estar",
+  8, "Saudade-Família-Casa-Amor-diCredico",
+  9, "Novela-TV-Séries",
+  10, "Educação",
+  11, "Política-Nacional",
+  12, "Homem-Mulher-Gênero",
+  13, "Sociedade-Cultura-Economia-Capitalismoo",
+  14, "Rapidinhas-Tecnologia-Arte-Design",
+  15, "Futebol-Times-Empresas",
+  16, "Escrita-Narrativa-Língua_Portuguesa",
+  17, "Internet-Redes_Sociais",
+  18, "New_Order-Cassio-Revista-News_Letter",
+  19, "Música-Cultura",
+  20, "Amor-Relacionamentos",
+  21, "Cidade-Rio-SP-Centros_Urbanos",
+  22, "Design-Publicidade-Moda-Jogos",
+  23, "Família-Pais-Filhos",
+  24, "Notícias-Jornalismo-Fake_News"
 ) %>% 
   mutate(label = as_factor(label))
 
-saveRDS(topic_labels, "saved_data/topic_labels.rds")
+saveRDS(topic_labels, "saved_data/topic_labels-20200602.rds")
 # These topic labels were hand created using common words, slug information and some reading.
 # Making new Plots using the labels ####
 gamma_terms %>%
@@ -383,7 +380,7 @@ gamma_terms %>%
   geom_text(hjust = 0, nudge_y = 0.0005, size = 3, color = rgb(.3, .3, .3)) +
   coord_flip() +
   scale_y_continuous(expand = c(0,0),
-                     limits = c(0, 0.095),
+                     limits = c(0, 0.11),
                      labels = percent_format()) +
   theme_tufte(ticks = FALSE) +
   theme(plot.title = element_text(size = 16),
@@ -391,10 +388,10 @@ gamma_terms %>%
         axis.text = element_text(size = 10),
         axis.title = element_text(size = 12)) +
   labs(x = NULL, y = expression(gamma),
-       title = "Named Topics by prevalence in New Order corpus",
-       subtitle = "With Topic Labels")
+       title = "Tópicos (Nomeados) ordenados por prevalência no conjunto de textos da New Order",
+       subtitle = "Com as palavras que mais contribuem para cada tópico")
 
-ggsave("plots/named_topics_by_prevalence.png",
+ggsave("plots/11-named_topics_by_prevalence.png",
        width = 25,
        height = 20,
        units = "cm")
@@ -402,29 +399,45 @@ ggsave("plots/named_topics_by_prevalence.png",
 library(GGally)
 library(network)
 library(sna)
+library(ggrepel)
 corr <- topicCorr(topic_model)
 net <- network(corr$posadj, directed = FALSE)
+my_rainbow <- scales::hue_pal()
 
 set.seed(1312)
-ggnet2(net,
-       size = round(gamma_terms$gamma * 250)*2,
-       edge.lty = "dotted",
-       edge.color = "black",
-       layout.exp = 0.3) +
-  theme(legend.position = "none",
-        plot.title = element_text(size = 16)) +
-  geom_point(color = "grey") +
-  geom_text(
-    aes(label = topic_labels$label), 
-    color = "black",
+network_plot <- ggnet2(
+  net,
+  size = round(gamma_terms$gamma * 250) * 2,
+  alpha = .2,
+  edge.lty = "dotted",
+  edge.color = "black",
+  layout.exp = 0.3,
+  color = my_rainbow(24)
+) +
+  geom_point(color = my_rainbow(24), size = 1) +
+  geom_label_repel(
+    aes(label = paste(topic_labels$topic, topic_labels$label, sep = " - ")),
+    color = "white",
+    fill = my_rainbow(24),
+    fontface = "bold",
     size = 3,
-    nudge_y = rep(c(-.02, .02), 18)) +
-  labs(title = "Topic Correlation Network")
+    segment.alpha = 0,
+    show.legend = FALSE
+  ) +
+  scale_fill_hue() +
+  labs(title = "Rede de Correlação entre Tópicos") +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 16))
+  
 
-ggsave("plots/topics_correlation_net.eps",
-       width = 25*1.25,
-       height = 20*1.25,
-       units = "cm")
+ggsave(
+  "plots/13-topics_correlation_net.png",
+  plot = network_plot,
+  width = 25,
+  height = 20,
+  units = "cm",
+  scale = 1.25
+)
 # Extract TD Gamma to Merge with posts_tbl_processed ####
 
 posts_tbl_topics <- posts_tbl_processed %>%
@@ -450,11 +463,16 @@ posts_tbl_topics <- posts_tbl_processed %>%
             by = c("prevalent_topic" = "topic"))
 
 
+posts_tbl_topics_path <- paste0("saved_data/posts_tbl_topics_",
+                                   gsub("-", "", today()),
+                                   ".rds")
 
-
-
-write_rds(posts_tbl_topics, "saved_data/posts_tbl_topics-20191202.rds")
-
+if (!file.exists(posts_tbl_topics_path)) {
+  
+  write_rds(posts_tbl_topics, posts_tbl_topics_path)
+} else {
+  processed_txts <- read_rds(posts_tbl_topics_path)  
+}
 
 
 # References ####  
